@@ -1,0 +1,169 @@
+{
+  "generatedAt": "2026-09-28T20:21:19.675808+00:00",
+  "host": "Apple M5, 10 cores (4P+6E), 16 GB",
+  "battlesPerConfiguration": 2400,
+  "trainingOpponent": "heuristic",
+  "rows": [
+    {
+      "config": {
+        "legacy": true
+      },
+      "architecture": "gru",
+      "battles": 2400,
+      "decisions": 21157,
+      "elapsedSeconds": 55.75,
+      "endToEndBattlesPerSecond": 43.05,
+      "timersSeconds": {
+        "send": 0.0,
+        "worker_wall": 0.0,
+        "round_trip": 0.0,
+        "serialize": 0.0,
+        "collect_wall": 44.801,
+        "ppo": 7.053,
+        "prep": 2.737,
+        "encodeMs": 0.0,
+        "encodeCalls": 0.0,
+        "chooseMs": 0.0,
+        "chooseCalls": 0.0,
+        "policyParseMs": 0.0,
+        "policyParseCalls": 0.0
+      },
+      "ppoSecondsPerBattle": 0.00294,
+      "prepSecondsPerBattle": 0.00114,
+      "serializeSecondsPerBattle": 0.0,
+      "sendSecondsPerBattle": 0.0
+    },
+    {
+      "config": {
+        "workers": 1,
+        "conc": 1
+      },
+      "architecture": "gru",
+      "battles": 2400,
+      "decisions": 21157,
+      "elapsedSeconds": 46.5,
+      "endToEndBattlesPerSecond": 51.61,
+      "timersSeconds": {
+        "send": 0.089,
+        "worker_wall": 30.94,
+        "round_trip": 35.432,
+        "serialize": 0.247,
+        "collect_wall": 35.573,
+        "ppo": 6.703,
+        "prep": 2.646,
+        "encodeMs": 4020.277,
+        "encodeCalls": 40438.0,
+        "chooseMs": 4499.746,
+        "chooseCalls": 40438.0,
+        "policyParseMs": 0.0,
+        "policyParseCalls": 0.0
+      },
+      "encodeCallsPerCpuSecond": 10058.5,
+      "inferenceDecisionsPerCpuSecond": 8986.7,
+      "simulatorOnlyCpuSecondsPerBattle": 0.00934,
+      "ppoSecondsPerBattle": 0.00279,
+      "prepSecondsPerBattle": 0.0011,
+      "serializeSecondsPerBattle": 0.0001,
+      "sendSecondsPerBattle": 4e-05
+    },
+    {
+      "config": {
+        "workers": 4,
+        "conc": 1
+      },
+      "architecture": "gru",
+      "battles": 2400,
+      "decisions": 21157,
+      "elapsedSeconds": 25.96,
+      "endToEndBattlesPerSecond": 92.45,
+      "timersSeconds": {
+        "send": 0.323,
+        "worker_wall": 40.465,
+        "round_trip": 49.443,
+        "serialize": 0.254,
+        "collect_wall": 14.322,
+        "ppo": 7.113,
+        "prep": 2.878,
+        "encodeMs": 5290.132,
+        "encodeCalls": 40438.0,
+        "chooseMs": 5840.0,
+        "chooseCalls": 40438.0,
+        "policyParseMs": 0.0,
+        "policyParseCalls": 0.0
+      },
+      "encodeCallsPerCpuSecond": 7644.0,
+      "inferenceDecisionsPerCpuSecond": 6924.3,
+      "simulatorOnlyCpuSecondsPerBattle": 0.01222,
+      "ppoSecondsPerBattle": 0.00296,
+      "prepSecondsPerBattle": 0.0012,
+      "serializeSecondsPerBattle": 0.00011,
+      "sendSecondsPerBattle": 0.00013
+    },
+    {
+      "config": {
+        "workers": 6,
+        "conc": 1
+      },
+      "architecture": "gru",
+      "battles": 2400,
+      "decisions": 21157,
+      "elapsedSeconds": 25.9,
+      "endToEndBattlesPerSecond": 92.66,
+      "timersSeconds": {
+        "send": 0.599,
+        "worker_wall": 50.941,
+        "round_trip": 64.391,
+        "serialize": 0.253,
+        "collect_wall": 14.186,
+        "ppo": 7.125,
+        "prep": 2.902,
+        "encodeMs": 6520.574,
+        "encodeCalls": 40438.0,
+        "chooseMs": 7013.469,
+        "chooseCalls": 40438.0,
+        "policyParseMs": 0.0,
+        "policyParseCalls": 0.0
+      },
+      "encodeCallsPerCpuSecond": 6201.6,
+      "inferenceDecisionsPerCpuSecond": 5765.8,
+      "simulatorOnlyCpuSecondsPerBattle": 0.01559,
+      "ppoSecondsPerBattle": 0.00297,
+      "prepSecondsPerBattle": 0.00121,
+      "serializeSecondsPerBattle": 0.00011,
+      "sendSecondsPerBattle": 0.00025
+    },
+    {
+      "config": {
+        "workers": 8,
+        "conc": 1
+      },
+      "architecture": "gru",
+      "battles": 2400,
+      "decisions": 21157,
+      "elapsedSeconds": 28.37,
+      "endToEndBattlesPerSecond": 84.6,
+      "timersSeconds": {
+        "send": 1.194,
+        "worker_wall": 75.173,
+        "round_trip": 96.781,
+        "serialize": 0.269,
+        "collect_wall": 15.583,
+        "ppo": 7.723,
+        "prep": 3.19,
+        "encodeMs": 10084.075,
+        "encodeCalls": 40438.0,
+        "chooseMs": 9978.139,
+        "chooseCalls": 40438.0,
+        "policyParseMs": 0.0,
+        "policyParseCalls": 0.0
+      },
+      "encodeCallsPerCpuSecond": 4010.1,
+      "inferenceDecisionsPerCpuSecond": 4052.7,
+      "simulatorOnlyCpuSecondsPerBattle": 0.02296,
+      "ppoSecondsPerBattle": 0.00322,
+      "prepSecondsPerBattle": 0.00133,
+      "serializeSecondsPerBattle": 0.00011,
+      "sendSecondsPerBattle": 0.0005
+    }
+  ]
+}

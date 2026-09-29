@@ -1,0 +1,30 @@
+{
+  "name": "showdown-arena",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "npm run build && node dist/src/server.js",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run build && node --test dist/tests/*.test.js",
+    "setup:viewer": "node scripts/setup-viewer.mjs",
+    "verify": "npm run build && node dist/src/verify.js",
+    "demo": "node scripts/demo.mjs",
+    "train:gen6": "npm run build && .venv-rl/bin/python agents/train_gen6.py",
+    "train:champions": "npm run build && .venv-rl/bin/python agents/train_champions.py",
+    "eval:champions": "npm run build && node scripts/evaluate-champions-vgc.mjs",
+    "ladder:champions": "npm run build && node dist/src/online-champions.js"
+  },
+  "dependencies": {
+    "pokemon-showdown": "github:smogon/pokemon-showdown#a5df8274e85b0889bf2a9b3422a08b39732374fc"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "24.10.1",
+    "typescript": "5.9.3"
+  }
+}

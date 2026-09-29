@@ -1,0 +1,11 @@
+node_modules/
+dist/
+data/
+.cache/
+public/vendor/
+__pycache__/
+*.pyc
+.DS_Store
+.venv-rl/
+models/*.pt
+runs/

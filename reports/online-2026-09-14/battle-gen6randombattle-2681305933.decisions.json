@@ -1,0 +1,102 @@
+[
+  {
+    "turn": 1,
+    "rqid": 3,
+    "choice": "move 4"
+  },
+  {
+    "turn": 2,
+    "rqid": 7,
+    "choice": "move 4"
+  },
+  {
+    "turn": 3,
+    "rqid": 9,
+    "choice": "move 4"
+  },
+  {
+    "turn": 4,
+    "rqid": 11,
+    "choice": "move 4"
+  },
+  {
+    "turn": 5,
+    "rqid": 15,
+    "choice": "move 4"
+  },
+  {
+    "turn": 5,
+    "rqid": 17,
+    "choice": "switch 4"
+  },
+  {
+    "turn": 6,
+    "rqid": 19,
+    "choice": "move 1"
+  },
+  {
+    "turn": 7,
+    "rqid": 21,
+    "choice": "move 1"
+  },
+  {
+    "turn": 8,
+    "rqid": 25,
+    "choice": "move 1"
+  },
+  {
+    "turn": 9,
+    "rqid": 29,
+    "choice": "move 3"
+  },
+  {
+    "turn": 10,
+    "rqid": 33,
+    "choice": "move 4"
+  },
+  {
+    "turn": 10,
+    "rqid": 35,
+    "choice": "switch 2"
+  },
+  {
+    "turn": 11,
+    "rqid": 37,
+    "choice": "move 3"
+  },
+  {
+    "turn": 12,
+    "rqid": 39,
+    "choice": "move 3"
+  },
+  {
+    "turn": 13,
+    "rqid": 43,
+    "choice": "move 4"
+  },
+  {
+    "turn": 14,
+    "rqid": 45,
+    "choice": "move 2"
+  },
+  {
+    "turn": 15,
+    "rqid": 47,
+    "choice": "move 4"
+  },
+  {
+    "turn": 15,
+    "rqid": 49,
+    "choice": "switch 3"
+  },
+  {
+    "turn": 16,
+    "rqid": 51,
+    "choice": "move 3"
+  },
+  {
+    "turn": 17,
+    "rqid": 53,
+    "choice": "move 3"
+  }
+]

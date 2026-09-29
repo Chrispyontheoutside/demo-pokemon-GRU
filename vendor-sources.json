@@ -1,0 +1,30 @@
+{
+  "repository": "https://github.com/smogon/pokemon-showdown-client",
+  "revision": "afa9d4ae645923e42fc8f587080c6bf3d13de2fc",
+  "source": {
+    "battle": "https://raw.githubusercontent.com/smogon/pokemon-showdown-client/afa9d4ae645923e42fc8f587080c6bf3d13de2fc/play.pokemonshowdown.com/src/battle.ts",
+    "replayEmbed": "https://raw.githubusercontent.com/smogon/pokemon-showdown-client/afa9d4ae645923e42fc8f587080c6bf3d13de2fc/play.pokemonshowdown.com/src/replay-embed.ts"
+  },
+  "generated": {
+    "abilities.js": "7d0b03ac3c969ccd7b0801609185dae374b77fbeeb9a4318a66d13431a3ae865",
+    "battle-log.css": "d50c093fde76832d8bdce6f2f73df33761218f4b38ce759d470d7c9861f3cc8d",
+    "battle-sound.js": "042c3812c4045228fed72325a16dcb2c9b24af9aa92730039d4bbc7f0ad6e8e7",
+    "battle.css": "546bb1c26fd3f4d22287749c3fc09dc45cf6aa51a6397a791a05752d3ec2bbe5",
+    "battle.js": "8476e55abadb9b608235ece34a87fefa31db9d2cb4b2e1b62270776bd69a77aa",
+    "battledata.js": "948a7f878f8504d845630e9c9af8723f1d11d053aff067e0fda04c145c2c330a",
+    "config.js": "be5a340e663c245566429b2853112168ef7791efddd4d91c91d9f20f0235b9db",
+    "font-awesome.css": "bc7f7ece9a95e2cead79c5253af1ec87c142544c7da0a69e3afae3e67fc3ca82",
+    "graphics.js": "fcf23f58e1d4d0dd98a5e9fc95947f29c1dacf543a92f775d2155b2d756ca047",
+    "html-sanitizer-minified.js": "618196efc83d034f173dd558fe0c53008717fd5d8752dfe230675175ab0a4998",
+    "items.js": "7fe470912bdbace70d2e6d144bd36d7e19de8f64ef8ac9f727d7c775ac8b67ee",
+    "jquery-1.11.0.min.js": "b294e973896f8f874e90a8eb1a8908ac790980d034c4c4bdf0fc3d37b8abf682",
+    "movedex.js": "09550a151a7027c269b43d60fb1b4c1d5f556b5080ab76c743c2a7ba057fe5f6",
+    "pokedex-mini-bw.js": "41b951a54eb8cd9fd3fad42610c9405ab80c33aacab90abc8601d63737586e4a",
+    "pokedex-mini.js": "108fd89933128e0384fea0c57d61bfec3ce233716f4b491120eb420d9ee9feeb",
+    "pokedex.js": "51fff3119be767d01edb5bd355d299ff35909debce4658237d3cb366daea9355",
+    "ps-polyfill.js": "ac62ecd186432c2c316153f7b3dcfffc4037ae70987f2454da2eebedbf145e01",
+    "replay.css": "3ce93dd4121288cc3da86345faacb5db59dc23963b111f300e5990e59b993c33",
+    "utilichart.css": "f0e9605f711abbf49b12d2d7810f9f28f801f20b723107c565da96bb49faa8a1"
+  },
+  "media": "Showdown sprites and battle effects resolve from play.pokemonshowdown.com at runtime; renderer code and styles are local."
+}

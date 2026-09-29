@@ -1,0 +1,12 @@
+[
+  {
+    "id": "random", "name": "Random", "version": "1.0.0",
+    "command": "python3", "args": ["agents/runner.py", "random"], "cwd": ".",
+    "config": {}, "description": "A seeded baseline that samples available actions."
+  },
+  {
+    "id": "heuristic", "name": "Heuristic", "version": "1.0.0",
+    "command": "python3", "args": ["agents/runner.py", "heuristic"], "cwd": ".",
+    "config": {}, "description": "Prioritizes strong, accurate attacks and healthy replacements."
+  }
+]

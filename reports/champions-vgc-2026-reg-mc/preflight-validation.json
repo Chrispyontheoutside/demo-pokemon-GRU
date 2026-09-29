@@ -1,0 +1,93 @@
+{
+  "format": "gen9championsvgc2026regmc",
+  "displayName": "[Gen 9 Champions] VGC 2026 Reg M-C",
+  "engineVersion": "0.11.11+a5df8274",
+  "liveLadder": {
+    "server": "wss://sim3.psim.us/showdown/websocket",
+    "searchAccepted": true,
+    "matchStarted": false,
+    "result": "verified_search_accepted"
+  },
+  "rulesDiff": {
+    "legalSpeciesFormsMC": 392,
+    "legalSpeciesFormsMB": 357,
+    "mcOnlySpeciesForms": 35,
+    "mcOnlyLegalItems": 18,
+    "moveRecordsChanged": 31,
+    "abilityRecordsChanged": 6
+  },
+  "teamGenerator": {
+    "generatedTeamsValidated": 200,
+    "mcOnlyTemplatesValidated": 35,
+    "teamsContainingMCOnlySpeciesOrForm": 53,
+    "teamsWithMCOnlyMegaItem": 8,
+    "itemClauseViolations": 0
+  },
+  "randomPolicyInterfaceRuns": [
+    {
+      "generated": 100,
+      "completed": 100,
+      "aborted": 0,
+      "truncated": 0,
+      "unavailableChoiceRetries": 0
+    },
+    {
+      "generated": 100,
+      "completed": 100,
+      "aborted": 0,
+      "truncated": 0,
+      "unavailableChoiceRetries": 0
+    },
+    {
+      "generated": 100,
+      "completed": 100,
+      "aborted": 0,
+      "truncated": 0,
+      "unavailableChoiceRetries": 0,
+      "teamGeneratorVersion": "m-c-statpoints-v1"
+    }
+  ],
+  "interface": {
+    "observationDimension": 800,
+    "candidateActionDimension": 56,
+    "encodedDecisions": 2951,
+    "teamPreviewChoices": 200,
+    "megaActionChoices": 103,
+    "unavailableChoiceRetries": 0
+  },
+  "latestThroughputBenchmark": {
+    "measuredBattles": 1000,
+    "benchmarkSimulationsIncludingReplayCheck": 1002,
+    "gamesPerSecondIncludingTeamBuild": 73.17729736362662,
+    "simulationOnlyGamesPerSecond": 88.31981044324661,
+    "unavailableChoiceRetries": 3,
+    "truncated": 0,
+    "workers": 1,
+    "teamGeneratorVersion": "m-c-statpoints-v1"
+  },
+  "mCPreflightBattleAccounting": {
+    "partialBenchmarkSimulations": 419,
+    "successfulBenchmarkSimulations": 2004,
+    "randomPolicySimulations": 301,
+    "randomPolicyCompleted": 300,
+    "randomPolicyAborted": 1,
+    "totalMCLocalBattlesGenerated": 3726,
+    "mBTrainingBattlesCounted": 0
+  },
+  "notes": [
+    "The 419 partial-benchmark simulations are two deterministic replay checks and 417 completed timed battles before an invalid Floette-Eternal team stopped that run.",
+    "The one aborted random-policy battle exposed omitted move accuracy; the encoder now treats omitted accuracy and priority as neutral values.",
+    "The M-C training ledger starts with self-play counters at zero; preflight simulations are counted separately.",
+    "The updated m-c-statpoints-v1 generator passed a separate 200-team legality sweep and 100 random-policy simulations before its next training run.",
+    "The refreshed 1,000-game throughput benchmark used m-c-statpoints-v1: 73.18 battles/sec including teams, 88.32/sec simulation-only, zero truncations. RandomPlayerAI made 3 recoverable unavailable-choice retries."
+  ],
+  "teamGeneratorRevision": {
+    "version": "m-c-statpoints-v1",
+    "generatedTeamsValidated": 200,
+    "invalidTeams": 0,
+    "teamsContainingMCOnlySpeciesOrForm": 49,
+    "teamsWithMCOnlyMegaItem": 5,
+    "statPointsPerPokemon": 66,
+    "maxPerStat": 32
+  }
+}

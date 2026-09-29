@@ -1,0 +1,17 @@
+{
+  "format": "gen9championsvgc2026regmc",
+  "serverUrl": "wss://sim3.psim.us/showdown/websocket",
+  "name": "ChampionsMC808583",
+  "status": "verified_search_accepted",
+  "searchAccepted": true,
+  "matchRoom": null,
+  "reason": "Live server listed the exact M-C format as an active ladder search; canceled before a match.",
+  "observed": [
+    "|updatesearch|{\"searching\":[],\"games\":null}",
+    "|updatesearch|{\"searching\":[],\"games\":null}",
+    "submitted /search gen9championsvgc2026regmc",
+    "|updatesearch|{\"searching\":[\"gen9championsvgc2026regmc\"],\"games\":null}",
+    "|updatesearch|{\"searching\":[],\"games\":null}"
+  ],
+  "checkedAt": "2026-09-28T14:48:58.435Z"
+}

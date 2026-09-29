@@ -1,0 +1,1251 @@
+{
+  "format": "gen9championsvgc2026regmc",
+  "checkpoint": "runs/champions-vgc-2026-reg-mc/seed-20260929-prior20-4000/policy.json",
+  "checkpointSHA256": "cc7d99a8cff5ea9bc7a8165977a771a72b4a47f5ea52bb2d7aab0c853ce7dabe",
+  "steps": 59991,
+  "simpleScoreWeight": 20,
+  "additionalSimpleScoreWeight": -20,
+  "effectiveSimpleScoreWeight": 0,
+  "selfPlayBattlesGenerated": 1000,
+  "selfPlayBattlesUsedForPPO": 1000,
+  "initialization": "random; no demonstration data",
+  "externalReplayTrainingBattles": 0,
+  "seed": 3100000000,
+  "pairsPerBaseline": 100,
+  "generated": 400,
+  "completed": 400,
+  "truncated": 0,
+  "aborted": 0,
+  "runs": [
+    {
+      "baseline": "random",
+      "pairs": 100,
+      "battles": 200,
+      "wins": 146,
+      "losses": 54,
+      "ties": 0,
+      "score": 0.73,
+      "paired95ci": [
+        0.67,
+        0.79
+      ],
+      "pairsData": [
+        {
+          "seed": 3100000000,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3100000001,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000002,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000003,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000004,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000005,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000006,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000007,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000008,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000009,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000010,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000011,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000012,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000013,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000014,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000015,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000016,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000017,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000018,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000019,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000020,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000021,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000022,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3100000023,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3100000024,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000025,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000026,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000027,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000028,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000029,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000030,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000031,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000032,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000033,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000034,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000035,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3100000036,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000037,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000038,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000039,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000040,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000041,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000042,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000043,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000044,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000045,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000046,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000047,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000048,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000049,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000050,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000051,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000052,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000053,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000054,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000055,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000056,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000057,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000058,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000059,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000060,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000061,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000062,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000063,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000064,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000065,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000066,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000067,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000068,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000069,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000070,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000071,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000072,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000073,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000074,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3100000075,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000076,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000077,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000078,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000079,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000080,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000081,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000082,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000083,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000084,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000085,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000086,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000087,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000088,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3100000089,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000090,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000091,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000092,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000093,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000094,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3100000095,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000096,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000097,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3100000098,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3100000099,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        }
+      ]
+    },
+    {
+      "baseline": "heuristic",
+      "pairs": 100,
+      "battles": 200,
+      "wins": 54,
+      "losses": 146,
+      "ties": 0,
+      "score": 0.27,
+      "paired95ci": [
+        0.215,
+        0.33
+      ],
+      "pairsData": [
+        {
+          "seed": 3101000000,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000001,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000002,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000003,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000004,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000005,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3101000006,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000007,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000008,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000009,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000010,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000011,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000012,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000013,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000014,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000015,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000016,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000017,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000018,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000019,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000020,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000021,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000022,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000023,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000024,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000025,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000026,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000027,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000028,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000029,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3101000030,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000031,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000032,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000033,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000034,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000035,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3101000036,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000037,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000038,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000039,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000040,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000041,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000042,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000043,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000044,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000045,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000046,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000047,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000048,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000049,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000050,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000051,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000052,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000053,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000054,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000055,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000056,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000057,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000058,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000059,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000060,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000061,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000062,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000063,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000064,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000065,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000066,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000067,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3101000068,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000069,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000070,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000071,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000072,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000073,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000074,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000075,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000076,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000077,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000078,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000079,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000080,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000081,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000082,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000083,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000084,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000085,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000086,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000087,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000088,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000089,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000090,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000091,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000092,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000093,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000094,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000095,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        },
+        {
+          "seed": 3101000096,
+          "firstWinner": "p2",
+          "secondWinner": "p2",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000097,
+          "firstWinner": "p1",
+          "secondWinner": "p1",
+          "pairedScore": 0.5
+        },
+        {
+          "seed": 3101000098,
+          "firstWinner": "p1",
+          "secondWinner": "p2",
+          "pairedScore": 1
+        },
+        {
+          "seed": 3101000099,
+          "firstWinner": "p2",
+          "secondWinner": "p1",
+          "pairedScore": 0
+        }
+      ]
+    }
+  ]
+}

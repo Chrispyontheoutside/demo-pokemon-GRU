@@ -1,0 +1,116 @@
+{
+  "experiment": "pokemon-champions-vgc-reg-m-b-random-init",
+  "format": "gen9championsvgc2026regmb",
+  "ladderSuccessCondition": "frozen policy >= 1200 real Pok\u00e9mon Showdown Elo",
+  "externalReplayTrainingBattles": 0,
+  "selfPlayBattlesGenerated": 3022,
+  "selfPlayBattlesCompleted": 3000,
+  "selfPlayBattlesUsedForPPO": 2974,
+  "selfPlayBattleAttempts": 3022,
+  "selfPlayBattlesTruncated": 12,
+  "selfPlayBattlesAborted": 10,
+  "evaluationBattles": 5600,
+  "randomThroughputBenchmarkBattles": 1000,
+  "runs": [
+    {
+      "seed": 20260928,
+      "checkpoint": "runs/champions-vgc-2026-reg-mb/seed-20260928/policy.json",
+      "generated": 11,
+      "completed": 0,
+      "truncated": 11,
+      "result": "stopped after repeated 200-turn caps; no optimizer update"
+    },
+    {
+      "seed": 20260939,
+      "checkpoint": "runs/champions-vgc-2026-reg-mb/seed-20260939/policy.json",
+      "generated": 1,
+      "completed": 0,
+      "truncated": 1,
+      "result": "diagnostic cap at turn 20; no optimizer update"
+    },
+    {
+      "seed": 20260940,
+      "checkpoint": "runs/champions-vgc-2026-reg-mb/seed-20260940/policy.json",
+      "generated": 1,
+      "completed": 0,
+      "truncated": 0,
+      "aborted": 1,
+      "result": "stopped on nonfinite feature guard at turn 1; no optimizer update"
+    },
+    {
+      "seed": 20260941,
+      "checkpoint": "runs/champions-vgc-2026-reg-mb/seed-20260941/policy.json",
+      "generated": 1,
+      "completed": 0,
+      "truncated": 0,
+      "aborted": 1,
+      "result": "failed",
+      "nextSeed": 20260942
+    },
+    {
+      "seed": 20260942,
+      "checkpoint": "runs/champions-vgc-2026-reg-mb/seed-20260942/policy.json",
+      "generated": 1,
+      "completed": 0,
+      "truncated": 0,
+      "aborted": 1,
+      "result": "failed",
+      "nextSeed": 20260943
+    },
+    {
+      "seed": 20260943,
+      "checkpoint": "runs/champions-vgc-2026-reg-mb/seed-20260943/policy.json",
+      "generated": 1,
+      "completed": 0,
+      "truncated": 0,
+      "aborted": 1,
+      "result": "failed",
+      "nextSeed": 20260944
+    },
+    {
+      "seed": 20260944,
+      "checkpoint": "runs/champions-vgc-2026-reg-mb/seed-20260944/policy.json",
+      "generated": 1,
+      "completed": 0,
+      "truncated": 0,
+      "aborted": 1,
+      "result": "failed",
+      "nextSeed": 20260945
+    },
+    {
+      "seed": 20260945,
+      "checkpoint": "runs/champions-vgc-2026-reg-mb/seed-20260945/policy.json",
+      "generated": 1,
+      "completed": 0,
+      "truncated": 0,
+      "aborted": 1,
+      "result": "failed",
+      "nextSeed": 20260946
+    },
+    {
+      "seed": 20260946,
+      "checkpoint": "runs/champions-vgc-2026-reg-mb/seed-20260946/policy.json",
+      "trainingOpponent": "selfplay",
+      "generated": 3004,
+      "completed": 3000,
+      "usedForPPO": 2974,
+      "truncated": 0,
+      "aborted": 4,
+      "baselineGenerated": 10001,
+      "baselineCompleted": 10000,
+      "baselineUsedForPPO": 9948,
+      "result": "complete",
+      "nextSeed": 20273951
+    }
+  ],
+  "lastUpdatedAt": "2026-09-28T14:25:31.051802+00:00",
+  "evaluationCompletedBattles": 5600,
+  "evaluationTruncatedBattles": 0,
+  "evaluationAbortedBattles": 0,
+  "baselineTrainingBattlesGenerated": 10001,
+  "baselineTrainingBattlesCompleted": 10000,
+  "baselineTrainingBattlesUsedForPPO": 9948,
+  "baselineTrainingBattleAttempts": 10001,
+  "baselineTrainingBattlesTruncated": 0,
+  "baselineTrainingBattlesAborted": 1
+}

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0e10"><title>Play the learner · Showdown Arena</title>
+  <link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/play.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to battle</a>
+  <header class="topbar"><div class="topbar-inner"><a class="brand" href="/">SHOWDOWN ARENA</a><nav class="nav" aria-label="Main"><a class="nav-link active" href="/play.html">Play Gen 6</a><a class="nav-link" href="/">Arena</a></nav><span class="connection is-online">Local play</span></div></header>
+  <main id="main">
+    <div class="page-heading"><p class="eyebrow">GEN 6 RANDOM BATTLES</p><h1 id="heading">Meet your sparring partner.</h1><p class="lede" id="intro">Six random Pokémon each. A locally trained opponent. Take your time.</p></div>
+    <div id="error" class="error-banner" role="alert" hidden></div>
+    <section id="welcome" class="panel play-welcome" aria-label="Start a battle"><div><h2>The learner</h2><p id="training" class="muted">Checking the trained checkpoint…</p><p class="muted">An experimental opponent learning from local battles. No account or public matchmaking.</p></div><button id="start" class="button button-primary" disabled>Start battle</button></section>
+    <div id="game" hidden>
+      <div class="play-grid">
+        <section class="panel viewer-panel" aria-label="Battlefield"><div class="panel-heading"><h2>You vs. Learner</h2><span id="turn" class="live-badge">Turn 1</span></div><iframe id="viewer" class="viewer-frame" title="Pokémon battle viewer" src="/viewer.html"></iframe></section>
+        <section class="panel decision-panel" aria-label="Your turn"><div class="panel-heading"><h2 id="decision-title">Your move</h2></div><p id="status" role="status" aria-live="polite"></p><label id="mega-label" class="mega-label" hidden><input id="mega" type="checkbox"> Mega Evolve with this move</label><div id="moves" class="moves" aria-label="Available moves"></div><div class="play-footer"><button id="forfeit" class="button button-danger">Forfeit</button><a id="replay" class="button button-secondary" href="#">Download replay</a></div></section>
+      </div>
+      <section class="panel team-panel" aria-label="Your team"><div class="panel-heading"><h2>Your team</h2><span class="muted">Select a Pokémon to switch</span></div><div id="team" class="team-grid"></div></section>
+      <details class="panel battle-events"><summary>Battle events</summary><pre id="events"></pre></details>
+    </div>
+  </main><script type="module" src="/play.js"></script>
+</body>
+</html>

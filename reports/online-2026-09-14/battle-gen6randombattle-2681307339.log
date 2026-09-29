@@ -1,0 +1,149 @@
+|init|battle
+|title|G6LearnerBot8926 vs. ackerjigen
+
+|t:|1789421312
+|gametype|singles
+|player|p1|G6LearnerBot8926|266|1057
+|player|p2|ackerjigen|169|1040
+|gen|6
+|tier|[Gen 6] Random Battle
+|rated|
+|rule|Sleep Clause Mod: Limit one foe put to sleep
+|rule|HP Percentage Mod: HP is shown in percentages
+|rule|Illusion Level Mod: Illusion disguises the Pokémon's true level
+|
+|t:|1789421312
+|teamsize|p1|6
+|teamsize|p2|6
+|start
+|switch|p1a: Medicham|Medicham, L84, M|237/237
+|switch|p2a: Raikou|Raikou, L79|100/100
+|-ability|p2a: Raikou|Pressure
+|turn|1
+|inactive|Battle timer is ON: inactive players will automatically lose when time's up. (requested by G6LearnerBot8926)
+|inactive|Time left: 150 sec this turn | 150 sec total | 60 sec grace
+|
+|t:|1789421339
+|move|p1a: Medicham|High Jump Kick|p2a: Raikou
+|-damage|p2a: Raikou|9/100
+|move|p2a: Raikou|Aura Sphere|p1a: Medicham
+|-resisted|p1a: Medicham
+|-damage|p1a: Medicham|207/237
+|
+|-heal|p2a: Raikou|15/100|[from] item: Leftovers
+|upkeep
+|turn|2
+|inactive|Time left: 150 sec this turn | 150 sec total
+|
+|t:|1789421366
+|move|p1a: Medicham|High Jump Kick|p2a: Raikou
+|-damage|p2a: Raikou|0 fnt
+|faint|p2a: Raikou
+|
+|upkeep
+|
+|t:|1789421371
+|switch|p2a: Eelektross|Eelektross, L85, M|100/100
+|turn|3
+|inactive|Time left: 150 sec this turn | 150 sec total
+|
+|t:|1789421376
+|move|p1a: Medicham|High Jump Kick|p2a: Eelektross
+|-damage|p2a: Eelektross|28/100
+|move|p2a: Eelektross|U-turn|p1a: Medicham
+|-damage|p1a: Medicham|142/237
+|
+|t:|1789421389
+|switch|p2a: Reshiram|Reshiram, L73|100/100|[from] U-turn
+|-ability|p2a: Reshiram|Turboblaze
+|
+|upkeep
+|turn|4
+|inactive|Time left: 150 sec this turn | 150 sec total
+|
+|t:|1789421399
+|move|p1a: Medicham|High Jump Kick|p2a: Reshiram
+|-damage|p2a: Reshiram|26/100
+|move|p2a: Reshiram|Blue Flare|p1a: Medicham
+|-damage|p1a: Medicham|0 fnt
+|faint|p1a: Medicham
+|
+|-heal|p2a: Reshiram|32/100|[from] item: Leftovers
+|upkeep
+|inactive|Time left: 150 sec this turn | 150 sec total | 5 sec grace
+|
+|t:|1789421399
+|switch|p1a: Crawdaunt|Crawdaunt, L83, F|240/240
+|turn|5
+|inactive|Time left: 150 sec this turn | 150 sec total
+|
+|t:|1789421416
+|switch|p2a: Eelektross|Eelektross, L85, M|28/100
+|move|p1a: Crawdaunt|Crabhammer|p2a: Eelektross
+|-damage|p2a: Eelektross|0 fnt
+|faint|p2a: Eelektross
+|-damage|p1a: Crawdaunt|216/240|[from] item: Life Orb
+|
+|upkeep
+|inactive|ackerjigen has 120 seconds left.
+|
+|t:|1789421429
+|switch|p2a: Ambipom|Ambipom, L82, F|100/100
+|turn|6
+|inactive|Time left: 150 sec this turn | 150 sec total
+|inactive|ackerjigen has 120 seconds left.
+|
+|t:|1789421440
+|move|p2a: Ambipom|U-turn|p1a: Crawdaunt
+|-supereffective|p1a: Crawdaunt
+|-damage|p1a: Crawdaunt|120/240
+|
+|t:|1789421444
+|switch|p2a: Swampert|Swampert, L80, F|100/100|[from] U-turn
+|move|p1a: Crawdaunt|Superpower|p2a: Swampert
+|-damage|p2a: Swampert|54/100
+|-unboost|p1a: Crawdaunt|atk|1
+|-unboost|p1a: Crawdaunt|def|1
+|-damage|p1a: Crawdaunt|96/240|[from] item: Life Orb
+|
+|upkeep
+|turn|7
+|inactive|Time left: 150 sec this turn | 150 sec total
+|
+|t:|1789421456
+|detailschange|p2a: Swampert|Swampert-Mega, L80, F
+|-mega|p2a: Swampert|Swampert|Swampertite
+|move|p2a: Swampert|Superpower|p1a: Crawdaunt
+|-supereffective|p1a: Crawdaunt
+|-damage|p1a: Crawdaunt|0 fnt
+|-unboost|p2a: Swampert|atk|1
+|-unboost|p2a: Swampert|def|1
+|faint|p1a: Crawdaunt
+|
+|upkeep
+|inactive|Time left: 150 sec this turn | 150 sec total | 5 sec grace
+|inactive|G6LearnerBot8926 has 120 seconds left.
+|inactive|G6LearnerBot8926 has 90 seconds left.
+|inactive|G6LearnerBot8926 has 60 seconds left.
+|inactive|G6LearnerBot8926 has 30 seconds left.
+|inactive|G6LearnerBot8926 has 20 seconds left.
+|inactive|G6LearnerBot8926 has 15 seconds left.
+|inactive|ackerjigen disconnected and has a minute to reconnect!
+|player|p2|
+|inactive|G6LearnerBot8926 has 10 seconds left.
+|
+|t:|1789421598
+|switch|p1a: Salamence|Salamence, L68, F|242/242
+|-ability|p1a: Salamence|Intimidate|boost
+|-unboost|p2a: Swampert|atk|1
+|turn|8
+|inactive|Time left: 25 sec this turn | 25 sec total
+|inactive|G6LearnerBot8926 has 25 seconds left this turn.
+|inactive|ackerjigen has 30 seconds to reconnect!
+|inactive|ackerjigen has 20 seconds to reconnect!
+|inactive|ackerjigen has 15 seconds to reconnect!
+|inactive|ackerjigen has 10 seconds to reconnect!
+|inactive|ackerjigen has 5 seconds to reconnect!
+|-message|ackerjigen lost due to inactivity.
+|
+|win|G6LearnerBot8926

@@ -1,0 +1,1 @@
+{"games":80,"opp":"heuristic","config":{"determinizations":4,"rollouts":3,"topK":8,"switchK":3,"maxTurns":12,"tau":0.1,"budgetMs":40000},"plain":0.65,"search":0.838,"pairedDiff":0.188,"ci95":[0.082,0.293],"msPerSearchedDecision":1441,"overrideRate":0.471,"seconds":187}

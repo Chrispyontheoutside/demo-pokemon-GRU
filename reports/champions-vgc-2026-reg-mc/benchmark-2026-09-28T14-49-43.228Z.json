@@ -1,0 +1,36 @@
+{
+  "format": "gen9championsvgc2026regmc",
+  "engineVersion": "0.11.11",
+  "node": "v24.19.0",
+  "platform": "darwin-arm64",
+  "policy": "upstream RandomPlayerAI; move=0.8, mega=0.5",
+  "teams": "local Showdown Champions random-set generator; duplicate items replaced to satisfy Item Clause; validated locally",
+  "workers": 1,
+  "games": 1000,
+  "seedIndices": [
+    1,
+    1000
+  ],
+  "maxTurns": 400,
+  "deterministicReplayCheck": "passed",
+  "coldBattleSeconds": 0.06572533399999997,
+  "seconds": 15.368469292,
+  "gamesPerSecond": 65.0682889102395,
+  "simulationOnlyGamesPerSecond": 73.10612511249623,
+  "teamBuildSeconds": 1.6897248850000004,
+  "meanTurns": 13.162,
+  "acceptedChoices": 63951,
+  "acceptedChoicesPerSecond": 4161.182144098727,
+  "choiceAttempts": 63956,
+  "unavailableChoiceRetries": 5,
+  "megaAttempts": 369,
+  "switchAttempts": 11575,
+  "truncated": 0,
+  "wins": {
+    "p1": 525,
+    "p2": 475
+  },
+  "naturalDraws": 0,
+  "peakRssMiB": 523.890625,
+  "note": "Choices count both players; includes team generation and legality checks in games/sec, but excludes neural inference, IPC, and optimization. Truncations are not wins or draws."
+}

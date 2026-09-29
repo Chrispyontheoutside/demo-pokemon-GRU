@@ -1,0 +1,23 @@
+#!/bin/bash
+# One-line candidate evaluation with a guard against silently re-reading an older report.
+#   scripts/eval-candidate.sh <label> <checkpoint.json> <learner-team.json> <opponent-team.json[,more...]> [frozen-opponent.json] [pairs] [seed]
+# The candidate plays its own team; the opposing side (heuristic, random and, if given, the frozen policy) plays the listed teams.
+cd "$(dirname "$0")/.."
+LABEL=$1; CK=$2; TEAM=$3; OPP=$4; FROZEN=${5:-}; PAIRS=${6:-150}; SEED=${7:-3300000000}
+[ -f "$CK" ] || { echo "$LABEL: checkpoint missing"; exit 1; }
+BEFORE=$(ls reports/champions-vgc-2026-reg-mc/evaluation-*.json | tail -1)
+if [ -n "$FROZEN" ]; then
+  EVAL_LEARNER_TEAM=$TEAM EVAL_OPPONENT_TEAMS=$OPP EVAL_JOBS=${EVAL_JOBS:-3} node scripts/evaluate-champions-vgc.mjs "$CK" "$PAIRS" "$SEED" 0 "$FROZEN" > /dev/null 2>&1
+else
+  EVAL_LEARNER_TEAM=$TEAM EVAL_OPPONENT_TEAMS=$OPP EVAL_JOBS=${EVAL_JOBS:-3} node scripts/evaluate-champions-vgc.mjs "$CK" "$PAIRS" "$SEED" > /dev/null 2>&1
+fi
+AFTER=$(ls reports/champions-vgc-2026-reg-mc/evaluation-*.json | tail -1)
+[ "$BEFORE" = "$AFTER" ] && { echo "$LABEL: EVALUATION FAILED (no new report)"; exit 1; }
+python3 - "$LABEL" "$AFTER" <<'E'
+import json,sys
+d=json.load(open(sys.argv[2])); r={x['baseline']:x for x in d['runs']}
+out=['%-28s'%sys.argv[1]]
+for k in ('heuristic','random','frozen'):
+    if k in r: out.append('%s %.3f [%.3f,%.3f]'%(k,r[k]['score'],*r[k]['paired95ci']))
+print(' | '.join(out))
+E

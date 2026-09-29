@@ -1,0 +1,52 @@
+[
+  {
+    "turn": 1,
+    "rqid": 2,
+    "choice": "move 4"
+  },
+  {
+    "turn": 2,
+    "rqid": 4,
+    "choice": "move 4"
+  },
+  {
+    "turn": 3,
+    "rqid": 8,
+    "choice": "move 4"
+  },
+  {
+    "turn": 4,
+    "rqid": 12,
+    "choice": "move 4"
+  },
+  {
+    "turn": 4,
+    "rqid": 14,
+    "choice": "switch 5"
+  },
+  {
+    "turn": 5,
+    "rqid": 16,
+    "choice": "move 4"
+  },
+  {
+    "turn": 6,
+    "rqid": 20,
+    "choice": "move 2"
+  },
+  {
+    "turn": 7,
+    "rqid": 24,
+    "choice": "move 2"
+  },
+  {
+    "turn": 7,
+    "rqid": 26,
+    "choice": "switch 4"
+  },
+  {
+    "turn": 8,
+    "rqid": 28,
+    "choice": "move 4 mega"
+  }
+]

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Showdown battle viewer</title>
+  <link rel="stylesheet" href="/vendor/showdown/battle.css">
+  <link rel="stylesheet" href="/vendor/showdown/replay.css">
+  <link rel="stylesheet" href="/vendor/showdown/utilichart.css">
+  <link rel="stylesheet" href="/vendor/showdown/font-awesome.css">
+  <link rel="stylesheet" href="/viewer.css">
+</head>
+<body>
+  <main class="viewer" aria-label="Battle replay viewer">
+    <div class="viewer-status" role="status" aria-live="polite">Loading battle viewer…</div>
+    <section class="showdown replay-wrapper" aria-label="Battle">
+      <div class="battle" aria-label="Animated battle"></div>
+      <div class="battle-log" aria-label="Battle log"></div>
+    </section>
+    <section class="viewer-controls" aria-label="Replay controls">
+      <button type="button" data-action="toggle" disabled>Play</button>
+      <button type="button" data-action="back" disabled>Previous turn</button>
+      <button type="button" data-action="forward" disabled>Next turn</button>
+      <button type="button" data-action="live" disabled>Jump to live</button>
+      <label>Speed <select data-action="speed" disabled>
+        <option value="hyperfast">Hyperfast</option>
+        <option value="fast">Fast</option>
+        <option value="normal" selected>Normal</option>
+        <option value="slow">Slow</option>
+        <option value="reallyslow">Really slow</option>
+      </select></label>
+      <label class="turn-control">Turn <input data-action="turn" type="range" min="0" max="0" value="0" disabled><output data-turn>0</output></label>
+      <button type="button" data-action="mute" aria-pressed="true">Muted</button>
+    </section>
+    <pre class="viewer-error" role="alert" hidden></pre>
+  </main>
+  <script src="/vendor/showdown/config.js"></script>
+  <script src="/vendor/showdown/ps-polyfill.js"></script>
+  <script src="/vendor/showdown/jquery-1.11.0.min.js"></script>
+  <script src="/vendor/showdown/html-sanitizer-minified.js"></script>
+  <script src="/vendor/showdown/battle-sound.js"></script>
+  <script src="/vendor/showdown/battledata.js"></script>
+  <script src="/vendor/showdown/pokedex.js"></script>
+  <script src="/vendor/showdown/movedex.js"></script>
+  <script src="/vendor/showdown/abilities.js"></script>
+  <script src="/vendor/showdown/items.js"></script>
+  <script src="/vendor/showdown/pokedex-mini.js"></script>
+  <script src="/vendor/showdown/pokedex-mini-bw.js"></script>
+  <script src="/vendor/showdown/graphics.js"></script>
+  <script src="/vendor/showdown/battle.js"></script>
+  <script src="/viewer.js"></script>
+</body>
+</html>

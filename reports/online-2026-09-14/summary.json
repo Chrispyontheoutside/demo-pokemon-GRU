@@ -1,0 +1,49 @@
+{
+  "name": "G6LearnerBot8926",
+  "format": "gen6randombattle",
+  "modelSHA256": "3bfba70cf44cf33c3326b5ebf39ff776d9f5c9f7a28d6fe9111a30f04441eb48",
+  "modelSteps": 200000,
+  "requestedGames": 2,
+  "results": [
+    {
+      "room": "battle-gen6randombattle-2681305933",
+      "players": {
+        "p1": "bmp83h",
+        "p2": "G6LearnerBot8926"
+      },
+      "winner": "G6LearnerBot8926",
+      "outcome": "win",
+      "turns": 17,
+      "decisions": 20,
+      "startRatings": {
+        "p1": 1160,
+        "p2": 1000
+      },
+      "termination": "opponent forfeit"
+    },
+    {
+      "room": "battle-gen6randombattle-2681307339",
+      "players": {
+        "p1": "G6LearnerBot8926",
+        "p2": "ackerjigen"
+      },
+      "winner": "G6LearnerBot8926",
+      "outcome": "win",
+      "turns": 8,
+      "decisions": 10,
+      "startRatings": {
+        "p1": 1057,
+        "p2": 1040
+      },
+      "termination": "opponent inactivity"
+    }
+  ],
+  "reason": "Trial complete",
+  "modelUnchanged": true,
+  "limitations": [
+    "Two public-ladder opponents; human identity not verified.",
+    "Neither game ended by all six opposing Pokemon fainting.",
+    "Second match shows approximately 142 seconds between own faint and replacement; request/dispatch timestamps were not recorded, so cause is unresolved.",
+    "Opponent name restored from player log after disconnect cleared it in the initial session summary."
+  ]
+}

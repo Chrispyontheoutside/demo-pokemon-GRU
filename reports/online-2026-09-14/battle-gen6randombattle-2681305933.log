@@ -1,0 +1,254 @@
+|init|battle
+|title|bmp83h vs. G6LearnerBot8926
+
+|t:|1789421143
+|gametype|singles
+|player|p1|bmp83h|acetrainer-gen4|1160
+|player|p2|G6LearnerBot8926|266|1000
+|gen|6
+|tier|[Gen 6] Random Battle
+|rated|
+|rule|Sleep Clause Mod: Limit one foe put to sleep
+|rule|HP Percentage Mod: HP is shown in percentages
+|rule|Illusion Level Mod: Illusion disguises the Pokémon's true level
+|
+|t:|1789421143
+|teamsize|p1|6
+|teamsize|p2|6
+|start
+|switch|p1a: Mismagius|Mismagius, L85, M|100/100
+|switch|p2a: Shiftry|Shiftry, L88, M|302/302
+|turn|1
+|inactive|Battle timer is ON: inactive players will automatically lose when time's up. (requested by G6LearnerBot8926)
+|inactive|Time left: 150 sec this turn | 150 sec total | 60 sec grace
+|inactive|bmp83h also wants the timer to be on.
+|
+|t:|1789421149
+|move|p1a: Mismagius|Trick|p2a: Shiftry
+|-activate|p1a: Mismagius|move: Trick|[of] p2a: Shiftry
+|-item|p2a: Shiftry|Choice Specs|[from] move: Trick
+|-item|p1a: Mismagius|Life Orb|[from] move: Trick
+|move|p2a: Shiftry|Knock Off|p1a: Mismagius
+|-supereffective|p1a: Mismagius
+|-damage|p1a: Mismagius|0 fnt
+|-enditem|p1a: Mismagius|Life Orb|[from] move: Knock Off|[of] p2a: Shiftry
+|faint|p1a: Mismagius
+|
+|upkeep
+|
+|t:|1789421170
+|switch|p1a: Forretress|Forretress, L81, M|100/100
+|turn|2
+|inactive|Time left: 150 sec this turn | 150 sec total
+|
+|t:|1789421172
+|move|p2a: Shiftry|Knock Off|p1a: Forretress
+|-damage|p1a: Forretress|67/100
+|-enditem|p1a: Forretress|Leftovers|[from] move: Knock Off|[of] p2a: Shiftry
+|move|p1a: Forretress|Stealth Rock|p2a: Shiftry
+|-sidestart|p2: G6LearnerBot8926|move: Stealth Rock
+|
+|upkeep
+|turn|3
+|inactive|Time left: 150 sec this turn | 150 sec total
+|
+|t:|1789421181
+|move|p2a: Shiftry|Knock Off|p1a: Forretress
+|-damage|p1a: Forretress|46/100
+|move|p1a: Forretress|Gyro Ball|p2a: Shiftry
+|-damage|p2a: Shiftry|221/302
+|
+|upkeep
+|turn|4
+|inactive|Time left: 150 sec this turn | 150 sec total
+|
+|t:|1789421189
+|move|p2a: Shiftry|Knock Off|p1a: Forretress
+|-damage|p1a: Forretress|26/100
+|move|p1a: Forretress|Volt Switch|p2a: Shiftry
+|-resisted|p2a: Shiftry
+|-damage|p2a: Shiftry|200/302
+|
+|t:|1789421193
+|switch|p1a: Wigglytuff|Wigglytuff, L93, F|100/100|[from] Volt Switch
+|
+|upkeep
+|turn|5
+|inactive|Time left: 150 sec this turn | 150 sec total
+|
+|t:|1789421196
+|move|p2a: Shiftry|Knock Off|p1a: Wigglytuff
+|-resisted|p1a: Wigglytuff
+|-damage|p1a: Wigglytuff|81/100
+|-enditem|p1a: Wigglytuff|Leftovers|[from] move: Knock Off|[of] p2a: Shiftry
+|move|p1a: Wigglytuff|Dazzling Gleam|p2a: Shiftry
+|-supereffective|p2a: Shiftry
+|-damage|p2a: Shiftry|0 fnt
+|faint|p2a: Shiftry
+|
+|upkeep
+|inactive|Time left: 150 sec this turn | 150 sec total | 5 sec grace
+|
+|t:|1789421197
+|switch|p2a: Darmanitan|Darmanitan, L80, M|299/299
+|-damage|p2a: Darmanitan|225/299|[from] Stealth Rock
+|turn|6
+|inactive|Time left: 150 sec this turn | 150 sec total
+|
+|t:|1789421201
+|move|p1a: Wigglytuff|Protect|p1a: Wigglytuff
+|-singleturn|p1a: Wigglytuff|Protect
+|move|p2a: Darmanitan|Flare Blitz|p1a: Wigglytuff
+|-activate|p1a: Wigglytuff|move: Protect
+|
+|upkeep
+|turn|7
+|inactive|Time left: 150 sec this turn | 150 sec total
+|
+|t:|1789421210
+|move|p2a: Darmanitan|Flare Blitz|p1a: Wigglytuff
+|-damage|p1a: Wigglytuff|0 fnt
+|faint|p1a: Wigglytuff
+|-damage|p2a: Darmanitan|115/299|[from] Recoil
+|
+|upkeep
+|
+|t:|1789421213
+|switch|p1a: Forretress|Forretress, L81, M|26/100
+|turn|8
+|inactive|Time left: 150 sec this turn | 150 sec total
+|inactive|G6LearnerBot8926 has 120 seconds left.
+|
+|t:|1789421249
+|move|p2a: Darmanitan|Flare Blitz|p1a: Forretress
+|-supereffective|p1a: Forretress
+|-damage|p1a: Forretress|0 fnt
+|faint|p1a: Forretress
+|-damage|p2a: Darmanitan|94/299|[from] Recoil
+|
+|upkeep
+|
+|t:|1789421256
+|switch|p1a: Mantine|Mantine, L90, F|100/100
+|turn|9
+|inactive|Time left: 130 sec this turn | 130 sec total
+|
+|t:|1789421261
+|move|p2a: Darmanitan|Rock Slide|p1a: Mantine
+|-supereffective|p1a: Mantine
+|-damage|p1a: Mantine|0 fnt
+|faint|p1a: Mantine
+|
+|upkeep
+|
+|t:|1789421265
+|switch|p1a: Electrode|Electrode, L88|100/100
+|turn|10
+|inactive|Time left: 145 sec this turn | 145 sec total
+|
+|t:|1789421268
+|move|p1a: Electrode|Thunderbolt|p2a: Darmanitan
+|-damage|p2a: Darmanitan|0 fnt
+|faint|p2a: Darmanitan
+|
+|upkeep
+|inactive|Time left: 150 sec this turn | 150 sec total
+|
+|t:|1789421269
+|switch|p2a: Dunsparce|Dunsparce, L93, F|337/337
+|-damage|p2a: Dunsparce|295/337|[from] Stealth Rock
+|turn|11
+|inactive|Time left: 150 sec this turn | 150 sec total
+|
+|t:|1789421272
+|move|p1a: Electrode|Toxic|p2a: Dunsparce
+|-status|p2a: Dunsparce|tox
+|move|p2a: Dunsparce|Earthquake|p1a: Electrode
+|-supereffective|p1a: Electrode
+|-damage|p1a: Electrode|34/100
+|
+|-heal|p1a: Electrode|40/100|[from] item: Leftovers
+|-heal|p2a: Dunsparce|316/337 tox|[from] item: Leftovers
+|-damage|p2a: Dunsparce|295/337 tox|[from] psn
+|upkeep
+|turn|12
+|inactive|Time left: 150 sec this turn | 150 sec total
+|
+|t:|1789421279
+|move|p1a: Electrode|Thunderbolt|p2a: Dunsparce
+|-crit|p2a: Dunsparce
+|-damage|p2a: Dunsparce|132/337 tox
+|move|p2a: Dunsparce|Earthquake|p1a: Electrode
+|-supereffective|p1a: Electrode
+|-damage|p1a: Electrode|0 fnt
+|faint|p1a: Electrode
+|
+|-heal|p2a: Dunsparce|153/337 tox|[from] item: Leftovers
+|-damage|p2a: Dunsparce|111/337 tox|[from] psn
+|upkeep
+|
+|t:|1789421283
+|switch|p1a: Simisage|Simisage, L88, F|100/100
+|turn|13
+|inactive|Time left: 150 sec this turn | 150 sec total
+|
+|t:|1789421285
+|move|p1a: Simisage|Nasty Plot|p1a: Simisage
+|-boost|p1a: Simisage|spa|2
+|move|p2a: Dunsparce|Body Slam|p1a: Simisage
+|-damage|p1a: Simisage|62/100
+|
+|-heal|p1a: Simisage|68/100|[from] item: Leftovers
+|-heal|p2a: Dunsparce|132/337 tox|[from] item: Leftovers
+|-damage|p2a: Dunsparce|69/337 tox|[from] psn
+|upkeep
+|turn|14
+|inactive|Time left: 150 sec this turn | 150 sec total
+|
+|t:|1789421292
+|move|p1a: Simisage|Nasty Plot|p1a: Simisage
+|-boost|p1a: Simisage|spa|2
+|move|p2a: Dunsparce|Roost|p2a: Dunsparce
+|-heal|p2a: Dunsparce|238/337 tox
+|-singleturn|p2a: Dunsparce|move: Roost
+|
+|-heal|p1a: Simisage|75/100|[from] item: Leftovers
+|-heal|p2a: Dunsparce|259/337 tox|[from] item: Leftovers
+|-damage|p2a: Dunsparce|175/337 tox|[from] psn
+|upkeep
+|turn|15
+|inactive|Time left: 150 sec this turn | 150 sec total
+|
+|t:|1789421298
+|move|p1a: Simisage|Focus Blast|p2a: Dunsparce
+|-supereffective|p2a: Dunsparce
+|-damage|p2a: Dunsparce|0 fnt
+|faint|p2a: Dunsparce
+|
+|-heal|p1a: Simisage|81/100|[from] item: Leftovers
+|upkeep
+|inactive|Time left: 150 sec this turn | 150 sec total | 5 sec grace
+|
+|t:|1789421298
+|switch|p2a: Vespiquen|Vespiquen, F|301/301
+|-damage|p2a: Vespiquen|151/301|[from] Stealth Rock
+|-ability|p2a: Vespiquen|Pressure
+|turn|16
+|inactive|Time left: 150 sec this turn | 150 sec total
+|
+|t:|1789421306
+|move|p1a: Simisage|Substitute|p1a: Simisage
+|-start|p1a: Simisage|Substitute
+|-damage|p1a: Simisage|56/100
+|move|p2a: Vespiquen|Air Slash|p1a: Simisage
+|-supereffective|p1a: Simisage
+|-end|p1a: Simisage|Substitute
+|
+|-heal|p1a: Simisage|62/100|[from] item: Leftovers
+|-heal|p2a: Vespiquen|169/301|[from] item: Leftovers
+|upkeep
+|turn|17
+|inactive|Time left: 150 sec this turn | 150 sec total
+|-message|bmp83h forfeited.
+|
+|win|G6LearnerBot8926
