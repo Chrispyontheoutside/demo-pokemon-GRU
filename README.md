@@ -1,5 +1,7 @@
 # Showdown Arena: play the Gen 6 learner
 
+> **Champions VGC Reg M-C agent:** see [CHAMPIONS.md](CHAMPIONS.md) for state, setup, training, evaluation, ladder and search usage.
+
 A trained local opponent is included at `models/gen6-policy.json`. Start the app with `npm start`, then open **http://127.0.0.1:3000/play.html** and choose **Start battle**. No Python process is needed to play. The original Gen 9 agent arena remains at `/`.
 
 You get six random Pokémon. Choose a move or select a teammate to switch; when available, check **Mega Evolve with this move** before choosing the move. Forced replacements, fainted Pokémon, trapped states, and unavailable moves are handled by the simulator requests. The learner responds immediately. You can reload the page to resume, forfeit, download the spectator replay, and play again. There is no turn timer while the page is open; abandoned sessions expire after 30 minutes. Battles are memory-only and do not survive server restarts. A safety cap ends games at 400 turns.

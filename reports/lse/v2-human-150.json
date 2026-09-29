@@ -1,0 +1,1 @@
+{"games":150,"opp":"human","config":{"determinizations":4,"rollouts":3,"topK":8,"switchK":3,"maxTurns":12,"tau":0.1,"budgetMs":40000},"plain":0.82,"search":0.9,"pairedDiff":0.08,"ci95":[0.007,0.153],"msPerSearchedDecision":1349,"overrideRate":0.442,"seconds":333}
