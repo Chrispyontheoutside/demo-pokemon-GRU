@@ -1,6 +1,36 @@
-# Showdown Arena: play the Gen 6 learner
+# Showdown Arena: local Pokémon RL agents
 
-> **Champions VGC Reg M-C agent:** see [CHAMPIONS.md](CHAMPIONS.md) for state, setup, training, evaluation, ladder and search usage.
+Two local reinforcement-learning projects on the Pokémon Showdown simulator, all trained on this machine with no LLM, no external replays and no pretrained Pokémon models:
+
+1. **Champions VGC Reg M-C agent** (`gen9championsvgc2026regmc`), the active project, trained to play the real Showdown ladder. Full guide: [CHAMPIONS.md](CHAMPIONS.md).
+2. **Gen 6 learner**, a small PPO opponent you can play against in the browser (documented below).
+
+## Champions VGC Reg M-C (current work)
+
+**Goal:** 1350 real rated ladder Elo, sustained (milestone rule: at least 50 rated games, final rating and last-25-game mean both at or above the threshold). Real ladder Elo is the only authoritative metric.
+
+**Honest state (2026-09-29):** the best real result is about 1229 final / 1273 peak on the account `avin-owes-me-25` (52-59 over 111 games; genuine 44-59 after excluding 8 early opponent forfeits). Those are spikes around a ~1100 population, not a sustained rating; no milestone is frozen. Local strength (0.85-0.90 vs the scripted heuristic) has never transferred to the ladder, which is why current work targets the opponents and inference rather than more of the same training.
+
+**What is in the repo:**
+- PPO trainer with GRU, feed-forward, wide/deep and entity-transformer models, parallel simulator workers and exact Python/Node inference parity (`agents/train_champions.py`, `src/champions-worker.ts`).
+- League training against heuristic, guarded, **human-behaviour**, self-play and frozen-pool opponents. The human opponent (`humanAction`) samples Protect / Fake Out / switch / focus-fire rates measured from our own ~500 ladder battles, with per-battle rating-band styles (`scripts/human-behaviour.py`).
+- Deployable **ladder-side search** (`src/reconstruct.ts`, `src/ladder-search.ts`): rebuilds the battle from what we know, samples opposing sets, rolls candidates out against the human model. Locally +8 points (95% CI +0.7 to +15.3) over the same policy without search, about 1.3 s per decision (`LADDER_SEARCH=1`).
+- A corrected roster-tracking view (`CHAMPIONS_VIEW=2`): the original `VisibleState` lost fainted and benched opposing Pokémon after switches (wrong in ~64% of states).
+- Ladder client, hash-keyed checkpoint registry with genuine-record accounting, and a milestone watcher (`src/online-champions.ts`, `scripts/champions-registry.mjs`, `scripts/watch-milestone.py`).
+
+**Quick start:**
+```sh
+npm ci && npm run build && npm test
+python3 -m venv .venv-rl && .venv-rl/bin/pip install torch numpy
+npm run train:champions -- --architecture gru --training-opponent mix --opponent-mix human=0.55,heuristic=0.05,selfplay=0.2,pool=0.2 ...
+EVAL_HUMAN=1 node scripts/evaluate-champions-vgc.mjs policy.json 300 3500000000
+CHAMPIONS_VIEW=2 LADDER_SEARCH=1 npm run ladder:champions -- 3 policy.json team.json   # real ladder games, only when intended
+```
+Details, all flags and the findings so far are in [CHAMPIONS.md](CHAMPIONS.md); the dated journal is [docs/champions-status.md](docs/champions-status.md). Checkpoints, ladder logs and team pools live in the gitignored `runs/` directory.
+
+---
+
+## Gen 6 learner: play against it locally
 
 A trained local opponent is included at `models/gen6-policy.json`. Start the app with `npm start`, then open **http://127.0.0.1:3000/play.html** and choose **Start battle**. No Python process is needed to play. The original Gen 9 agent arena remains at `/`.
 
@@ -134,6 +164,6 @@ Browser checks covered starting a game, an ordinary switch, a move, forced repla
 
 Player observations originate only from each player's redacted simulator stream and private request. Neither policy nor value reads opposing generated teams, opponent exact HP, battle RNG seeds, or the other player's pending choice. The evaluator owns those seeds separately. The compact encoder is deliberately incomplete: it omits most item/ability identities, detailed move histories, many temporary effects, and hazard layer counts. Illusion and uncommon transformations need a more complete identity/state tracker for serious competitive training. Damage features are approximations, not a damage calculator. Simulator mechanics remain authoritative even when the policy's features are incomplete.
 
-The original arena's recovery-schema and completed-result rating bugs are repaired. Existing source files and user assets were preserved through focused edits, not a reset or replacement. The workspace started without any Git commits; changes remain uncommitted. The initial design and simulator benchmarks are preserved in `GEN6_RL_ASSESSMENT.md`.
+The original arena's recovery-schema and completed-result rating bugs are repaired. Existing source files and user assets were preserved through focused edits, not a reset or replacement. The repository is on GitHub (`main`); generated runs and checkpoints under `runs/` are not committed. The initial design and simulator benchmarks are preserved in `GEN6_RL_ASSESSMENT.md`.
 
-The next useful work is a richer public-state encoder, stronger baseline/opponent diversity, and multiple training seeds with held-out evaluation. Longer training alone is not justified by the present comparison. The current goal—an actual trained learner you can play against locally—is implemented.
+The next useful work is a richer public-state encoder, stronger baseline/opponent diversity, and multiple training seeds with held-out evaluation. Longer training alone is not justified by the present comparison. The Gen 6 goal—an actual trained learner you can play against locally—is implemented; active development is the Champions agent above.

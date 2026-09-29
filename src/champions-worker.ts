@@ -448,27 +448,61 @@ export function guardedAction(encoded: Encoded, request: any, random: () => numb
  * from our own ladder logs (scripts/human-behaviour.py -> human-behaviour.json, keyed "turnBucket:hpBucket"), then take the highest-scoring
  * candidate that realises the sampled kinds. Humans switched about 4-10% per slot-turn almost independently of HP.
  */
-const HUMAN_RATES: Record<string, {protect: number; fakeout: number; switch: number}> = (() => {
-  try { return JSON.parse(readFileSync(new URL('../../runs/champions-vgc-2026-reg-mc/human-behaviour.json', import.meta.url), 'utf8')).table; } catch { return {}; }
+type Rates = {protect: number; fakeout: number; switch: number};
+interface HumanBand {rows: number; focusFire: number; table: Record<string, Rates>}
+const HUMAN_DATA: {table: Record<string, Rates>; bands: Record<string, HumanBand>} = (() => {
+  try { return JSON.parse(readFileSync(new URL('../../runs/champions-vgc-2026-reg-mc/human-behaviour.json', import.meta.url), 'utf8')); } catch { return {table: {}, bands: {}}; }
 })();
+/** Per-battle human style: a rating band (drawn by observed frequency), jittered rates, and a focus-fire preference. Cached per RNG (one per battle side). */
+interface HumanStyle {table: Record<string, Rates>; focus: number; sloppy: number}
+const styleCache = new WeakMap<object, HumanStyle>();
+function humanStyle(random: () => number): HumanStyle {
+  let style = styleCache.get(random);
+  if (style) return style;
+  const bands = Object.values(HUMAN_DATA.bands);
+  let table = HUMAN_DATA.table, focus = 0.3;
+  if (bands.length) {
+    let draw = random() * bands.reduce((n, band) => n + band.rows, 0), band = bands[0];
+    for (const candidate of bands) { draw -= candidate.rows; if (draw <= 0) { band = candidate; break; } }
+    table = band.table; focus = band.focusFire;
+  }
+  const jitter = 0.7 + 0.6 * random();                     // this player is somewhat more or less Protect/switch-happy than the band average
+  const scaled: Record<string, Rates> = {};
+  for (const [key, r] of Object.entries(table)) scaled[key] = {protect: r.protect * jitter, fakeout: r.fakeout, switch: r.switch * (2 - jitter)};
+  style = {table: scaled, focus: Math.max(0, Math.min(1, focus + 0.2 * (random() - 0.5))), sloppy: 0.02 + 0.13 * random()};
+  styleCache.set(random, style);
+  return style;
+}
+/**
+ * Empirical-human opponent (scripts/human-behaviour.py -> human-behaviour.json). Each battle gets a style (rating band, rate jitter,
+ * focus-fire preference, occasional sloppy pick). Per active slot it samples Protect / Fake Out / voluntary switch / attack with the measured
+ * conditional rates ("turnBucket:hpBucket"), then takes the highest-scoring candidate realising the sampled kinds and the target preference.
+ */
 export function humanAction(encoded: Encoded, request: any, random: () => number): number {
+  const style = humanStyle(random);
   const turn = Math.round((encoded.state[0] ?? 0) * 100);
   const turnBucket = turn <= 1 ? 0 : turn <= 3 ? 1 : 2;
   const slots = Math.max(1, request?.active?.length ?? 2);
+  if (random() < style.sloppy) return Math.floor(random() * encoded.candidates.length);
   const wanted: string[] = [];
   for (let slot = 0; slot < slots; slot++) {
-    const hp = hpOf(request?.side?.pokemon?.[slot]?.condition), rates = HUMAN_RATES[`${turnBucket}:${hp < 0.35 ? 0 : hp < 0.7 ? 1 : 2}`];
+    const hp = hpOf(request?.side?.pokemon?.[slot]?.condition), rates = style.table[`${turnBucket}:${hp < 0.35 ? 0 : hp < 0.7 ? 1 : 2}`];
     const u = random();
     wanted.push(!rates ? 'move' : u < rates.protect ? 'protect' : u < rates.protect + rates.fakeout ? 'fakeout' : u < rates.protect + rates.fakeout + rates.switch ? 'switch' : 'move');
   }
+  const focusWanted = random() < style.focus;
   let best = 0, bestScore = -Infinity;
   encoded.candidates.forEach((candidate, index) => {
     let score = candidate.simpleScore + 0.05 * random();
-    candidate.choice.split(',').map(part => part.trim()).forEach((part, slot) => {
+    const parts = candidate.choice.split(',').map(part => part.trim());
+    const targets: string[] = [];
+    parts.forEach((part, slot) => {
       const tokens = part.split(/\s+/), id = tokens[0] === 'move' ? request?.active?.[slot]?.moves?.[Number(tokens[1]) - 1]?.id : undefined;
       const kind = tokens[0] === 'switch' ? 'switch' : GUARD_MOVES.has(id) ? 'protect' : id === 'fakeout' ? 'fakeout' : 'move';
       if (kind === wanted[slot]) score += 10;      // realise the sampled kind; within it the damage heuristic decides
+      if (kind === 'move' && Number(tokens[2]) > 0) targets.push(tokens[2]);   // 1/2 = the two foes
     });
+    if (targets.length === 2) score += (targets[0] === targets[1]) === focusWanted ? 1.5 : 0;
     if (score > bestScore) { bestScore = score; best = index; }
   });
   return best;

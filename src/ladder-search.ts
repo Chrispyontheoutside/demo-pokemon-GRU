@@ -21,7 +21,8 @@ export function makeLadderSearch(policy: Policy, ownPack: string, config: Ladder
       built++;
       if (hidden) game.hidden[side] = [...hidden];
       const agents = side === 'p1' ? {p1: policy, p2: 'human' as const} : {p1: 'human' as const, p2: policy};
-      const result = searchDecision(game, side, agents, random, {topK: config.topK, switchK: config.switchK, randomK: 0, rollouts: config.rollouts, maxTurns: config.maxTurns});
+      const detRandom = () => random();          // a fresh RNG identity per determinization, so each samples its own human style
+      const result = searchDecision(game, side, agents, detRandom, {topK: config.topK, switchK: config.switchK, randomK: 0, rollouts: config.rollouts, maxTurns: config.maxTurns});
       result.subset.forEach((index, i) => {
         const key = result.encoded.candidates[index].choice;
         const entry = sums.get(key) ?? {total: 0, count: 0};
