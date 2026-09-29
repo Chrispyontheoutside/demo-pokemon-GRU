@@ -267,3 +267,12 @@ GRU (concurrency 1): legacy 43, 1 worker 52, 4 workers 92, 6 workers 93, 8 worke
 - Ladder: new account 52-59 over 111 games (genuine 44-59); 15 turn-1 opponent concedes (all wins), 8 early-forfeit wins on the new account. Total simulator training battles so far about 5.4M (ledger sum, approximate); 506 unique real ladder battles.
 - Code and docs pushed to https://github.com/Chrispyontheoutside/demo-pokemon-GRU (runs/, .cache/ and checkpoints are not in the repo). See `CHAMPIONS.md` for usage.
 - Next: sample rating-band styles per battle in `humanAction`; evaluate arms 4 vs 5; play the search-enabled control on the ladder in a bounded session; keep the 1250/1350 watcher running.
+
+## Update 2026-09-29 (evening): arms compared, preview search, ladder queue
+
+- Per-battle human styles (rating band, rate jitter, focus-fire preference, 2-15% sloppy picks) are now sampled by `humanAction`.
+- Arm comparison on held-out human teams (120 pairs, +-0.05 noise), vs heuristic / guarded / human: control(v1) 0.879 / 0.871 / 0.863; h4 (human-opp training, v1 view) 0.854, 0.812 heuristic and 0.829, 0.796 human (no gain); **h5v2 (same training, corrected view) 0.917, 0.887 heuristic and 0.875, 0.850 human**. Consistent ~+5 pts over the v1 arms on both seeds; local benchmarks are near saturation, so the ladder must decide.
+- Ladder-side search now also searches team preview (lead choice): rate the top-12 distinct lead sets over 3 determinizations x 3 full-game rollouts against the human model (~1 s). Local paired eval vs the human model, 200 games: +2.0 (CI -3.4 to +7.4) with preview search, +1.0 without; the earlier +8.0 (150 games) was a different sample. Search gain is real but small and not resolvable locally.
+- Ladder: control with search (`registry/search/policy-search.json`, distinct hash) is 4-4 after 8 games; queue order now: search-control to 40 games, h5v2-team1a plain (046ed1c564a3) to 60, h5v2-team1a + search to 60. All with CHAMPIONS_VIEW=2. Watch `python3 <scratchpad>/sv.py`-style tallies via the registry `ingest-ladder`.
+- Training: `humanclimb6-20260929` (v2 view, human styles, warm-start from h5v2-team1a) running, 2 seeds.
+- Still far from 1350: best real 1229 final / 1273 peak, no sustained milestone.
