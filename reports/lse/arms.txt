@@ -1,0 +1,9 @@
+control v1                   | heuristic 0.879 [0.833,0.921] | guarded 0.871 [0.821,0.917] | human 0.863 [0.812,0.908] | random 0.979 [0.958,0.996]
+h4-team1a v1 policy-60000.json | heuristic 0.854 [0.796,0.904] | guarded 0.867 [0.821,0.912] | human 0.829 [0.775,0.879] | random 0.946 [0.917,0.971]
+h4-team1b v1 policy-60000.json | heuristic 0.812 [0.754,0.867] | guarded 0.838 [0.787,0.887] | human 0.796 [0.742,0.850] | random 0.946 [0.917,0.971]
+usage: basename string [suffix]
+       basename [-a] [-s suffix] string [...]
+h5v2-team1a v2 : EVALUATION FAILED (no new report)
+usage: basename string [suffix]
+       basename [-a] [-s suffix] string [...]
+h5v2-team1b v2 : EVALUATION FAILED (no new report)

@@ -16,7 +16,7 @@ import {makeLadderSearch, DEFAULT_LADDER_SEARCH} from '../dist/src/ladder-search
 const args = process.argv.slice(2);
 const opt = (n, f) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : f; };
 const games = Number(opt('--games', 40)), jobs = Number(opt('--jobs', 4)), oppKind = opt('--opp', 'human');
-const cfg = {...DEFAULT_LADDER_SEARCH, determinizations: Number(opt('--det', 4)), rollouts: Number(opt('--rollouts', 3))};
+const cfg = {...DEFAULT_LADDER_SEARCH, determinizations: Number(opt('--det', 4)), rollouts: Number(opt('--rollouts', 3)), previewCandidates: Number(opt('--preview', 12))};
 const own = JSON.parse(readFileSync(opt('--team'), 'utf8')).pack;
 const oppPacks = opt('--opp-teams', '').split(',').filter(Boolean).map(p => JSON.parse(readFileSync(p, 'utf8')).pack);
 const prng = n => { const r = new showdown.PRNG(`41,53,${(n >>> 16) & 65535},${n & 65535}`); return () => r.random(); };
@@ -27,11 +27,14 @@ function play(policy, seed, useSearch) {
   const rng = {p1: prng(seed * 2), p2: prng(seed * 2 + 1)};
   const game = DirectGame.create(ourSide === 'p1' ? [own, foePack] : [foePack, own], [7, 9, seed >>> 16 & 65535, seed & 65535]);
   const searcher = useSearch ? makeLadderSearch(policy, own, cfg, prng(seed * 5 + 3)) : null;
-  let searchMs = 0, decisions = 0, overridden = 0;
+  let searchMs = 0, decisions = 0, overridden = 0, previewMs = 0, previewOverridden = 0;
   const t0 = Date.now();
   // Team preview: both sides bring the first four (same for search / no-search so the comparison is paired).
   // Team preview: the policy picks its own four (as on the ladder); the opponent brings its first four.
-  { const enc = game.encodeFor(ourSide), pick = policy.choose(enc, rng[ourSide], undefined, undefined); game.hidden[ourSide] = pick.nextHidden; game.choose(ourSide, enc.candidates[pick.action].choice); game.choose(foeSide, 'team 1234'); }
+  { const enc = game.encodeFor(ourSide), pick = policy.choose(enc, rng[ourSide], undefined, undefined); game.hidden[ourSide] = pick.nextHidden;
+    let action = pick.action;
+    if (searcher && cfg.previewCandidates > 0) { const t = performance.now(); const found = searcher(enc, game.requests[ourSide], game.views[ourSide], undefined); previewMs += performance.now() - t; if (found) { previewOverridden += found.action !== action; action = found.action; } }
+    game.choose(ourSide, enc.candidates[action].choice); game.choose(foeSide, 'team 1234'); }
   let guard = 0;
   while (!game.ended && guard++ < 200) {
     for (const side of game.pending()) {
@@ -48,7 +51,7 @@ function play(policy, seed, useSearch) {
       if (!game.choose(side, encoded.candidates[action].choice)) act(game, side, policy, rng[side]);
     }
   }
-  return {seed, win: game.winner === ourSide ? 1 : game.winner ? 0 : 0.5, searchMs, decisions, overridden};
+  return {seed, win: game.winner === ourSide ? 1 : game.winner ? 0 : 0.5, searchMs, decisions, overridden, previewMs, previewOverridden};
 }
 
 if (worker) {
@@ -73,4 +76,5 @@ const mean = avg(diffs), sd = Math.sqrt(avg(diffs.map(d => (d - mean) ** 2)) * d
 console.log(JSON.stringify({games, opp: oppKind, config: cfg, plain: +avg(plain.map(r => r.win)).toFixed(3), search: +avg(search.map(r => r.win)).toFixed(3),
   pairedDiff: +mean.toFixed(3), ci95: [+(mean - 1.96 * sd / Math.sqrt(diffs.length)).toFixed(3), +(mean + 1.96 * sd / Math.sqrt(diffs.length)).toFixed(3)],
   msPerSearchedDecision: +(avg(search.map(r => r.searchMs)) / Math.max(1, avg(search.map(r => r.decisions)))).toFixed(0),
+  previewMs: +(avg(search.map(r => r.previewMs))).toFixed(0), previewOverride: +(search.reduce((a, r) => a + r.previewOverridden, 0) / Math.max(1, search.length)).toFixed(3),
   overrideRate: +(search.reduce((a, r) => a + r.overridden, 0) / Math.max(1, search.reduce((a, r) => a + r.decisions, 0))).toFixed(3), seconds: Math.round((Date.now() - started) / 1000)}));

@@ -205,3 +205,25 @@ export function viewFromBattle(battle: any, side: SideId, turn: number): Visible
   view.turn = turn;
   return view;
 }
+
+/** A determinized packed opposing team (all six species, revealed information copied, gaps sampled) from what `view` knows. */
+export function guessFoePack(view: VisibleState, foe: SideId, random: () => number): string | undefined {
+  const byBase = new Map<string, (typeof view.teams)[SideId][number]>();
+  for (const mon of view.teams[foe]) {
+    const key = baseOf(mon.details), held = byBase.get(key);
+    if (!held || (mon.active && !held.active) || (!held.active && held.condition === '' && mon.condition !== '')) byBase.set(key, mon);
+  }
+  const team = [...byBase.values()];
+  if (team.length < 6) return undefined;
+  for (let attempt = 0; attempt < 12; attempt++) {
+    const used = new Set<string>();
+    try {
+      return packValidatedTeam(team.map(mon => {
+        const mega = speciesOf(mon.details).includes('-Mega') ? speciesOf(mon.details) : undefined;
+        const base = mega ? dex.species.get(mega).baseSpecies : speciesOf(mon.details);
+        return guessSet({species: dex.species.get(base).name, moves: mon.moves, item: mon.item, ability: mon.ability, mega}, used, random);
+      }));
+    } catch { /* resample */ }
+  }
+  return undefined;
+}
