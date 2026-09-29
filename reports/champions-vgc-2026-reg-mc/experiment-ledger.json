@@ -6,7 +6,7 @@
   "initialization": "fresh random policy/value weights; no M-B checkpoint loaded",
   "mBTrainingBattlesExcluded": true,
   "externalReplayTrainingBattles": 0,
-  "totalMCLocalBattlesGenerated": 91677,
+  "totalMCLocalBattlesGenerated": 91692,
   "randomThroughputBenchmarkBattles": 3425,
   "benchmarkMeasuredBattles": 3000,
   "benchmarkDeterminismCheckBattles": 8,
@@ -30,10 +30,10 @@
   "evaluationCompletedBattles": 30600,
   "evaluationTruncatedBattles": 0,
   "evaluationAbortedBattles": 0,
-  "ladderBattlesStarted": 666,
-  "ladderBattlesCompleted": 510,
-  "ladderWins": 228,
-  "ladderLosses": 282,
+  "ladderBattlesStarted": 681,
+  "ladderBattlesCompleted": 522,
+  "ladderWins": 234,
+  "ladderLosses": 288,
   "ladderTies": 0,
   "runs": [
     {
@@ -296,6 +296,6 @@
       "nextSeed": 20280937
     }
   ],
-  "lastUpdatedAt": "2026-09-29T18:27:13.836Z",
+  "lastUpdatedAt": "2026-09-29T19:54:04.103Z",
   "preflightRandomPolicyBattlesTruncated": 0
 }
