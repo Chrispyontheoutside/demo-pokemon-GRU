@@ -56,10 +56,11 @@ function monFeatures(pokemon: any, visible?: VisibleMon) {
   const statusSlot = statuses.indexOf(status);
   if (statusSlot >= 0) out[3 + statusSlot] = 1;
   statValues({...pokemon, species: name, details}).forEach((value: number, i: number) => out[9 + i] = Math.min(1, value));
-  const pokemonTypes: string[] = visible?.types ?? species.types ?? [];
+  const pokemonTypes: string[] = visible?.types ?? (FEATURES_V4 ? pokemon.types : undefined) ?? species.types ?? [];
   types.forEach((type, i) => out[15 + i] = Number(pokemonTypes.includes(type)));
-  const boosts = visible?.boosts ?? {};
-  stats.concat(['accuracy','evasion']).forEach((name: string, i: number) => out[33 + i] = (Number(boosts[name] ?? 0) / 6));
+  const boosts = visible?.boosts ?? (FEATURES_V4 ? pokemon.boosts : undefined) ?? {};
+  const boostStats = FEATURES_V4 ? ['atk','def','spa','spd','spe','accuracy','evasion'] : stats.concat(['accuracy','evasion']);
+  boostStats.forEach((name: string, i: number) => out[33 + i] = (Number(boosts[name] ?? 0) / 6));
   fillHash(out, 40, 8, name);
   fillHash(out, 48, 4, pokemon.item ?? visible?.item ?? '');
   fillHash(out, 52, 4, pokemon.baseAbility ?? pokemon.ability ?? visible?.ability ?? '');
@@ -69,7 +70,12 @@ function monFeatures(pokemon: any, visible?: VisibleMon) {
 }
 
 /** Roster-tracking version of the visible state: 1 = original, 2 = corrected (see findSwitchedIn). Set CHAMPIONS_VIEW=2 to enable. */
-export const VIEW_V2 = process.env.CHAMPIONS_VIEW === '2';
+export const VIEW_LEVEL = Number(process.env.CHAMPIONS_VIEW ?? 1);
+export const VIEW_V2 = VIEW_LEVEL >= 2;      // corrected roster tracking
+export const VIEW_V3 = VIEW_LEVEL >= 3;      // also corrected weather/terrain/room/side-condition parsing and boost reset on switch
+export const FEATURES_V4 = process.env.CHAMPIONS_FEATURES === '4';
+export const FEATURES_V3 = process.env.CHAMPIONS_FEATURES === '3' || FEATURES_V4;
+export const VGC_FIELD_EFFECTS = ['reflect','lightscreen','auroraveil','tailwind','safeguard','mist'];
 
 interface VisibleMon {
   details: string; condition: string; types: string[]; active: boolean;
@@ -129,12 +135,17 @@ export class VisibleState {
       if (previous) previous.active = false;
       const mon = VIEW_V2 ? this.findSwitchedIn(side, arg) : this.findMon(side, who, arg);
       if (mon) {
+        if (FEATURES_V4 && command !== 'replace') mon.boosts = {};
         mon.details = arg;
         mon.types = dex.species.get(speciesName(arg)).types;
         mon.condition = value;
+        if (VIEW_V3) mon.boosts = {};
         mon.active = true;
         this.active[side].set(who.split(':')[0], mon);
       }
+    }
+    if (FEATURES_V4 && command === '-clearallboost') {
+      for (const team of Object.values(this.active)) for (const mon of team.values()) mon.boosts = {};
     }
     const current = this.active[side]?.get(who.split(':')[0]);
     if (current) {
@@ -158,6 +169,8 @@ export class VisibleState {
         current.types = dex.species.get(speciesName(arg)).types;
       }
     }
+    if (VIEW_V3) this.receiveField(command, who, arg, side);
+    else {
     if (command === '-weather') this.weather = arg.toLowerCase() === 'none' ? '' : statusId(arg);
     if (command === '-fieldstart') {
       if (arg.toLowerCase().includes('trick room')) this.trickRoom = true;
@@ -171,6 +184,30 @@ export class VisibleState {
     }
     if (command === '-sidestart' && (side === 'p1' || side === 'p2')) this.fields[side].add(statusId(arg));
     if (command === '-sideend' && (side === 'p1' || side === 'p2')) this.fields[side].delete(statusId(arg));
+    }
+  }
+
+  /**
+   * v3 field parsing. Showdown puts the weather/field name in the first argument (`|-weather|RainDance|[from] ability: Drizzle`,
+   * `|-fieldstart|move: Psychic Terrain|...`, `|-sidestart|p2: Name|move: Tailwind`); v1/v2 read the wrong argument, so weather, terrain,
+   * Trick Room, Gravity and Tailwind/Light Screen were never recognised.
+   */
+  private receiveField(command: string, who: string, arg: string, side: SideId) {
+    const clean = (text: string) => statusId(text.replace(/^move:\s*/i, ''));
+    if (command === '-weather') {
+      const name = clean(who);
+      this.weather = name === 'none' || name === '' ? '' : name === 'snowscape' ? 'snow' : name;
+    }
+    if (command === '-fieldstart' || command === '-fieldend') {
+      const name = clean(who), on = command === '-fieldstart';
+      if (name === 'trickroom') this.trickRoom = on;
+      if (name === 'gravity') this.gravity = on;
+      if (name.endsWith('terrain')) this.terrain = on ? name : '';
+    }
+    if ((command === '-sidestart' || command === '-sideend') && (side === 'p1' || side === 'p2')) {
+      const name = clean(arg);
+      if (command === '-sidestart') this.fields[side].add(name); else this.fields[side].delete(name);
+    }
   }
 
   private makeMon(set: any): VisibleMon {
@@ -218,10 +255,19 @@ function packState(request: any, view: VisibleState, side: SideId, preview: bool
   weather.forEach((value, i) => state[8 + i] = Number(view.weather === value));
   const terrain = ['electricterrain','grassyterrain','mistyterrain','psychicterrain'];
   terrain.forEach((value, i) => state[16 + i] = Number(view.terrain.includes(value)));
-  ['stealthrock','spikes','toxicspikes','stickyweb','reflect','lightscreen','tailwind','safeguard'].forEach((value, i) => {
-    state[20 + i] = Number(view.fields[side].has(value));
-    state[28 + i] = Number(view.fields[foe].has(value));
-  });
+  if (FEATURES_V3) {
+    // The header ends at 31. Legacy opposing fields at 32..35 were overwritten below.
+    // Use six VGC field effects per side; hazard flags remain available only in the legacy layout.
+    VGC_FIELD_EFFECTS.forEach((value, i) => {
+      state[20 + i] = Number(view.fields[side].has(value));
+      state[26 + i] = Number(view.fields[foe].has(value));
+    });
+  } else {
+    ['stealthrock','spikes','toxicspikes','stickyweb','reflect','lightscreen','tailwind','safeguard'].forEach((value, i) => {
+      state[20 + i] = Number(view.fields[side].has(value));
+      state[28 + i] = Number(view.fields[foe].has(value));
+    });
+  }
   for (let i = 0; i < 6; i++) {
     const own = ownTeam[i] ?? {};
     const ownVisible = view.teams[side].find(mon => statusId(speciesName(mon.details)) === statusId(speciesName(own.details ?? '')));
@@ -261,7 +307,7 @@ function emptyComponent(kind: 'move'|'switch'|'pass'|'preview') {
 }
 
 function moveOptions(active: any, activeSlot: number, request: any, view: VisibleState, side: SideId) {
-  const options: Array<{choice: string; features: number[]; mega: boolean; switchSlot?: number; target?: number; score: number}> = [];
+  const options: Array<{choice: string; features: number[]; mega: boolean; switchSlot?: number; target?: number; score: number; knownImmune?: boolean}> = [];
   const moves = Array.isArray(active?.moves) ? active.moves : [];
   const foes: SideId = side === 'p1' ? 'p2' : 'p1';
   const targets = [`${foes}a`, `${foes}b`].map(ident => view.active[foes].get(ident));
@@ -274,6 +320,12 @@ function moveOptions(active: any, activeSlot: number, request: any, view: Visibl
     const targetType = requestMove.target;
     let aim: Array<number | null> = [null];
     if (['normal','any','adjacentFoe'].includes(targetType)) aim = request.active?.length > 1 ? [0,1] : [null];
+    // Ally targeting is offered for support/healing; ally-damage combinations need an explicit training curriculum.
+    if (request.active?.length > 1 && ['normal','any'].includes(targetType) && (move.category === 'Status' || move.id === 'pollenpuff')) {
+      const allySlot = activeSlot === 0 ? 1 : 0;
+      const ally = request.side.pokemon.filter((p: any) => p.active)[allySlot];
+      if (ally && hpFrom(ally) > 0) aim.push(-(allySlot + 1));
+    }
     else if (targetType === 'adjacentAlly') aim = request.active?.length > 1 ? [activeSlot === 0 ? -2 : -1] : [null];
     else if (targetType === 'adjacentAllyOrSelf') aim = request.active?.length > 1 ? [-1,-2] : [null];
     const canMega = active?.canMegaEvo === true;
@@ -290,6 +342,8 @@ function moveOptions(active: any, activeSlot: number, request: any, view: Visibl
       if (target !== null && target >= 0) {
         const knownTarget = targets[target];
         eff = effectiveness(move.type, knownTarget);
+      } else if (target !== null && target < 0) {
+        eff = effectiveness(move.type, request.side.pokemon.filter((p: any) => p.active)[-target - 1]);
       } else if (move.target === 'allAdjacentFoes' || move.target === 'allAdjacent') {
         eff = Math.max(1, ...targets.map(mon => effectiveness(move.type, mon)));
       }
@@ -311,8 +365,12 @@ function moveOptions(active: any, activeSlot: number, request: any, view: Visibl
       features[17] = Number(target !== null && target < 0);
       fillHash(features, 18, 4, move.id);
       fillHash(features, 22, 2, move.type);
-      const score = power * accuracy * Math.max(0.25, eff) * stab / 100 + priority * 0.05 + (features[15] ? 0.2 : 0) + Number(mega) * 0.05;
-      options.push({choice, features, mega, target: target ?? undefined, score});
+      const friendlyDamage = target !== null && target < 0 && power > 0 && move.id !== 'pollenpuff';
+      const score = (friendlyDamage ? -1 : 1) * power * accuracy * Math.max(0.25, eff) * stab / 100 + priority * 0.05 + (features[15] ? 0.2 : 0) + Number(mega) * 0.05 - (move.id === 'decorate' && target !== null && target >= 0 ? 2 : 0);
+      const ability = statusId(own.ability ?? own.baseAbility ?? '');
+      const bypassGhost = ['scrappy','mindseye'].includes(ability) && ['Normal','Fighting'].includes(move.type);
+      const knownImmune = target !== null && target >= 0 && eff === 0 && power > 0 && !move.ignoreImmunity && !move.self && !bypassGhost;
+      options.push({choice, features, mega, target: target ?? undefined, score, knownImmune});
     }
   }
   if (!moves.length) options.push({choice:'move 1',features:emptyComponent('move'),mega:false,score:0.05});
@@ -335,7 +393,8 @@ function moveOptions(active: any, activeSlot: number, request: any, view: Visibl
       options.push({choice:`switch ${index+1}`,features,mega:false,switchSlot:index,score:0.12 + hpFrom(pokemon) * 0.08 - maxAttack * 0.02});
     });
   }
-  return options;
+  const effectiveOptions = options.filter(option => !option.knownImmune);
+  return effectiveOptions.length ? effectiveOptions : options;
 }
 
 function previewCandidates(request: any): Candidate[] {

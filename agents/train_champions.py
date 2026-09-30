@@ -75,12 +75,13 @@ class EntityTransformer(nn.Module):
 class Model(nn.Module):
     def __init__(self, simple_score_weight=0.0, heuristic_imitation_weight=0.0,
                  initialization='fresh random weights; no demonstration data', recurrent=False, hidden=64, depth=1,
-                 trunk='mlp', tf_layers=2):
+                 trunk='mlp', tf_layers=2, joint_head=False):
         super().__init__()
         self.hidden_size = hidden
         self.depth = depth
         self.trunk = trunk
         self.tf_layers = tf_layers
+        self.joint_head = joint_head
         self.simple_score_weight = simple_score_weight
         self.heuristic_imitation_weight = heuristic_imitation_weight
         self.initialization = initialization
@@ -109,6 +110,11 @@ class Model(nn.Module):
             self.state2 = nn.Linear(hidden, hidden)
             nn.init.orthogonal_(self.state2.weight, np.sqrt(2))
             nn.init.zeros_(self.state2.bias)
+        if joint_head:
+            self.joint_hidden = nn.Linear(hidden, hidden)
+            self.joint_score = nn.Linear(hidden, 1)
+            nn.init.zeros_(self.joint_score.weight)
+            nn.init.zeros_(self.joint_score.bias)
 
     def hidden_sequence(self, states):
         """states: [batch, time, STATE_DIM] -> [batch, time, 64]; recurrent memory starts at zero per battle side."""
@@ -131,6 +137,8 @@ class Model(nn.Module):
     def heads(self, hidden, actions, mask, simple_scores=None):
         action_hidden = torch.tanh(self.action(actions) + hidden.unsqueeze(1))
         logits = self.score(action_hidden).squeeze(-1)
+        if self.joint_head:
+            logits = logits + self.joint_score(torch.tanh(self.joint_hidden(action_hidden))).squeeze(-1)
         if simple_scores is not None:
             logits = logits + self.simple_score_weight * simple_scores
         values = torch.tanh(self.critic(hidden).squeeze(-1))
@@ -169,6 +177,7 @@ class Model(nn.Module):
                     baselineTrainingBattlesUsedForPPO=baseline_trained_on,
                     trainingOpponentBattles=dict(self.opponent_counts),
                     simpleScoreWeight=self.simple_score_weight,
+                    jointHeadResidual=self.joint_head,
                     heuristicImitationWeight=self.heuristic_imitation_weight,
                     initialization=self.initialization,
                     algorithm='PPO with terminal-only GAE and optional local heuristic-action loss',
@@ -325,6 +334,8 @@ def main():
     parser.add_argument('--pool', help='comma-separated frozen checkpoint JSON files used as historical opponents for the "pool" kind')
     parser.add_argument('--seed', type=int, default=20260928)
     parser.add_argument('--output', default='runs/champions-vgc-2026-reg-mc/seed-20260929/policy.json')
+    parser.add_argument('--learning-rate', type=float, default=3e-4)
+    parser.add_argument('--joint-head', action='store_true', help='add a zero-initialized residual action/context scoring head')
     parser.add_argument('--batch-games', type=int, default=8)
     parser.add_argument('--simple-score-weight', type=float, default=0.0)
     parser.add_argument('--heuristic-imitation-weight', type=float, default=0.0,
@@ -377,14 +388,14 @@ def main():
             mix_weights = {kind: float(weight) for kind, weight in (item.split('=') for item in (args.opponent_mix or '').split(','))}
         except ValueError:
             parser.error('--opponent-mix must look like heuristic=0.3,selfplay=0.3,pool=0.4')
-        if (not mix_weights or any(kind not in ('heuristic', 'heuristic2', 'human', 'random', 'selfplay', 'pool') or weight <= 0 for kind, weight in mix_weights.items())
+        if (not mix_weights or any(kind not in ('heuristic', 'heuristic2', 'human', 'search', 'random', 'selfplay', 'pool') or weight <= 0 for kind, weight in mix_weights.items())
                 or ('pool' in mix_weights) != bool(pool_paths) or args.legacy_collect or args.debug):
             parser.error('mix needs positive weights over heuristic/random/selfplay/pool, --pool iff pool is mixed, and the worker pool (no --legacy-collect/--debug)')
     elif args.opponent_mix or pool_paths:
         parser.error('--opponent-mix and --pool require --training-opponent mix')
     if args.workers < 1 or args.concurrency < 1 or args.torch_threads < 1:
         parser.error('workers, concurrency and torch-threads must be positive')
-    if (args.battles < 1 or args.seed < 0 or args.batch_games < 1 or
+    if (args.battles < 1 or args.seed < 0 or args.batch_games < 1 or not np.isfinite(args.learning_rate) or args.learning_rate <= 0 or
             not np.isfinite(args.simple_score_weight) or not np.isfinite(args.heuristic_imitation_weight) or
             args.heuristic_imitation_weight < 0):
         parser.error('battles and batch-games must be positive; seed nonnegative; score weight finite; imitation weight finite and nonnegative')
@@ -397,9 +408,9 @@ def main():
                       f'resumed checkpoint {args.output}')
     model = Model(args.simple_score_weight, args.heuristic_imitation_weight, initialization,
                   recurrent=args.architecture == 'gru', hidden=args.hidden, depth=args.depth,
-                  trunk=args.trunk, tf_layers=args.tf_layers)
+                  trunk=args.trunk, tf_layers=args.tf_layers, joint_head=args.joint_head)
     model.exploration = args.switch_exploration
-    optimizer = torch.optim.Adam(model.parameters(), lr=3e-4)
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     state_path = output.with_suffix('.pt')
@@ -432,8 +443,12 @@ def main():
                 ('gru' in parent.get('modelArchitecture')) != model.recurrent or
                 (parent.get('hiddenSize', 64), parent.get('depth', 1), parent.get('trunk', 'mlp')) != (model.hidden_size, model.depth, model.trunk)):
             parser.error('--init-from checkpoint is incompatible with this M-C policy')
-        model.load_state_dict({name: torch.tensor(value, dtype=torch.float32)
-                               for name, value in parent['weights'].items()}, strict=True)
+        if parent.get('jointHeadResidual', False) and not args.joint_head:
+            parser.error('parent has a residual joint head; pass --joint-head')
+        initial_weights = {name: torch.tensor(value, dtype=torch.float32) for name, value in parent['weights'].items()}
+        if args.joint_head and not parent.get('jointHeadResidual', False):
+            initial_weights.update({name: value for name, value in model.state_dict().items() if name.startswith('joint_')})
+        model.load_state_dict(initial_weights, strict=True)
         if parent.get('modelArchitecture') == 'candidate-conditioned-v2':
             # v2 critics were fit against returns corrupted by repeated terminal rewards.
             with torch.no_grad():

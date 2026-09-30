@@ -15,18 +15,19 @@ export const hasVoluntarySwitch = (candidate: {features: number[]}) => candidate
 export function act(game: DirectGame, side: SideId, agent: Agent, random: () => number) {
   let encoded = game.encodeFor(side);
   const rejected = new Set<string>();
-  for (let attempt = 0; attempt < 30; attempt++) {
-    const candidates = encoded.candidates.filter(candidate => !candidate.choice.split(',').some(part => rejected.has(part.trim())));
-    if (!candidates.length) throw new Error(`No acceptable choice left for ${side}`);
+  const maxAttempts = encoded.candidates.length + 1;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const candidates = encoded.candidates.filter(candidate => !rejected.has(candidate.choice));
+    if (!candidates.length) throw new Error(`No acceptable choice left for ${side}: ${JSON.stringify(game.lastRejection)}`);
     const sub: Encoded = {...encoded, candidates};
     let index: number, nextHidden: number[] | undefined;
     if (agent === 'heuristic') index = heuristic(sub);
     else if (agent === 'guarded') index = guardedAction(sub, game.requests[side], random);
-    else if (agent === 'human') index = humanAction(sub, game.requests[side], random);
+    else if (agent === 'human') index = humanAction(sub, game.requests[side], random, game.views[side], side);
     else { const pick = agent.choose(sub, random, undefined, game.hidden[side]); index = pick.action; nextHidden = pick.nextHidden; }
     const choice = candidates[index].choice;
     if (game.choose(side, choice)) { if (nextHidden) game.hidden[side] = nextHidden; return choice; }
-    for (const part of choice.split(',')) rejected.add(part.trim());
+    rejected.add(choice);
     encoded = game.encodeFor(side);
   }
   throw new Error(`Too many rejected choices for ${side}`);
@@ -51,9 +52,10 @@ export interface SearchResult {encoded: Encoded; prior: number[]; subset: number
 export function searchDecision(game: DirectGame, side: SideId, agents: Agents, random: () => number, config: SearchConfig): SearchResult {
   const encoded = game.encodeFor(side);
   const agent = agents[side];
+  const prediction = typeof agent === 'string' ? undefined : agent.predict(encoded, undefined, game.hidden[side]);
   const prior = typeof agent === 'string'
     ? encoded.candidates.map((_, i) => Number(i === heuristic(encoded)))
-    : agent.predict(encoded, undefined, game.hidden[side]).probabilities;
+    : prediction!.probabilities;
   const order = prior.map((p, i) => [p, i] as const).sort((a, b) => b[0] - a[0]).map(([, i]) => i);
   const chosen = new Set(order.slice(0, config.topK));
   order.filter(i => hasVoluntarySwitch(encoded.candidates[i]) && !chosen.has(i)).slice(0, config.switchK).forEach(i => chosen.add(i));
@@ -67,7 +69,10 @@ export function searchDecision(game: DirectGame, side: SideId, agents: Agents, r
       const trial = game.clone();
       let ok = true;
       for (const s of trial.pending()) {
-        if (s === side) ok = trial.choose(side, encoded.candidates[index].choice);
+        if (s === side) {
+          ok = trial.choose(side, encoded.candidates[index].choice);
+          if (ok && prediction?.hidden) trial.hidden[side] = [...prediction.hidden];
+        }
         else act(trial, foe, agents[foe], random);
       }
       if (!ok) return -2;                                   // rejected by the simulator: never preferred

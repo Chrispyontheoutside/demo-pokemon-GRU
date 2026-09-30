@@ -74,14 +74,14 @@ async function battle(seedIndex, learnerSide, baseline) {
   saveLedger();
   const random = {p1: prng(seedIndex * 2), p2: prng(seedIndex * 2 + 1)};
   try {
-    const result = await play(seedIndex, (side, encoded, hidden, request) => {
+    const result = await play(seedIndex, (side, encoded, hidden, request, view) => {
       let action, logp = 0, value = 0, entropy = 0;
       let nextHidden;
       if (side === learnerSide) ({action, logp, value, entropy, nextHidden} = policy.choose(encoded, random[side], simpleScoreWeight + additionalSimpleScoreWeight, hidden, temperature));
       else if (baseline === 'random') action = Math.floor(random[side]() * encoded.candidates.length);
       else if (baseline === 'heuristic') action = heuristic(encoded);
       else if (baseline === 'guarded') action = guardedAction(encoded, request, random[side]);
-      else if (baseline === 'human') action = humanAction(encoded, request, random[side]);
+      else if (baseline === 'human') action = humanAction(encoded, request, random[side], view, side);
       else ({action, nextHidden} = frozenPolicy.choose(encoded, random[side], undefined, hidden));
       return {action, logp, value, entropy, nextHidden, choice: encoded.candidates[action].choice};
     }, 200, false, {...(learnerTeam ? {[learnerSide]: learnerTeam} : {}),

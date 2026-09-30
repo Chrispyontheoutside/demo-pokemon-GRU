@@ -11,6 +11,7 @@ const {Teams} = showdown as any;
 
 export class DirectGame {
   battle: any;
+  lastRejection?: {side: SideId; message: string};
   views: Record<SideId, VisibleState> = {p1: new VisibleState(), p2: new VisibleState()};
   requests: Partial<Record<SideId, any>> = {};
   hidden: Partial<Record<SideId, number[]>> = {};
@@ -31,6 +32,7 @@ export class DirectGame {
       for (const line of channels[2] ?? []) this.views.p2.receive(line);
     } else if (type === 'sideupdate') {
       const [side, rest] = String(data).split(/\n(.*)/s) as [SideId, string];
+      if (rest?.startsWith('|error|')) this.lastRejection = {side, message:rest};
       if (rest?.startsWith('|request|')) {
         const json = rest.slice(9);
         this.requests[side] = json && json !== 'null' ? JSON.parse(json) : undefined;
@@ -52,6 +54,7 @@ export class DirectGame {
    * The engine commits the turn automatically once every pending side has chosen.
    */
   choose(side: SideId, choice: string): boolean {
+    this.lastRejection = undefined;
     const accepted = this.battle.choose(side, choice) !== false;
     this.battle.sendUpdates();   // the stream wrapper does this after every command; it emits the log slice and the next requests
     return accepted;

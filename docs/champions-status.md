@@ -285,3 +285,176 @@ GRU (concurrency 1): legacy 43, 1 worker 52, 4 workers 92, 6 workers 93, 8 worke
 - `humanclimb6` (v2 view + per-battle human styles, warm-started from h5v2-team1a) at 60k: heuristic 0.85/0.84, guarded 0.87/0.87, human 0.85/0.84 vs h5v2-team1a 0.88/0.91/0.91 on the same fresh seed (150 pairs, +-0.05). More human-opponent training does not help locally; h5v2-team1a stays the best local candidate.
 - The 1250 watcher fired earlier (12:06 CDT): a 2-turn win (opponent concession) took the account 1244 -> 1273; last-25 mean 1136, rating since back to ~1100. Evidence in `milestones-live/elo-1250-20260929T120638/`; screenshot failed (no Screen Recording permission). This is a spike, not a milestone; nothing is frozen at 1250.
 - Ladder, search-enabled control (`registry/search/policy-search.json`): 10-9 after 19 games, rating ~1101; 105 searched decisions (19 preview), ~1.4 s each, no errors.
+
+
+**Transformer check (2026-09-29 15:43 CDT):** 20k and 60k snapshots completed evaluation. At 60k, score vs heuristic 0.780 [0.738, 0.820], vs guarded 0.810 [0.767, 0.850]; GRU control 0.858 [0.812, 0.897] / 0.833 [0.790, 0.873]. Training stopped at 69,840 completed battles on a rollout JS/Torch log-probability assertion (one of 32 values, absolute difference 0.000496; tolerance atol=rtol=0.0001). Restarted the existing driver from its saved checkpoint without changing code or tolerances; startup parity passed and training advanced to 71,856 completed battles at 39.6/sec. PPO used 71,840 battles; the failed batch accounts for 16 completed battles not used for PPO. The 100k target and subsequent fixed evaluation remain scheduled by the driver. This numerical failure is unresolved; a successful restart does not establish its cause.
+
+
+**Active goal: 1350 Elo sustained over 50 battles (2026-09-29).** `scripts/audit-1350.py` now verifies a consecutive window on one account/checkpoint/team/temperature, every post-battle rating >=1350, with server rating messages matched to saved logs. Current audit: no qualifying window; avin-owes-me-25 latest 1153. `coverage-1350-20260929` is running a 64-GRU adaptation from h5v2-team1a on corrected view v2, with 1,816 legal synthetic team variants from 458 own training-source battles and 80 later own battles held out before fitting team frequencies and human behavior. Existing scripts now accept a separate raw output path and room-restricted behavior fit. Snapshots/evaluations at 20k and 60k new battles; 200 paired seeds against random/heuristic/guarded/human opponents. The parent may have seen held-out data previously; this limitation is recorded. No automatic ladder promotion. Existing queue is finishing search-control (38/40 recorded games on this account), then testing h5v2 plain and search. Transformer experiment remains live toward 100k.
+
+
+**Transformer experiment completed:** 100k fresh compact-transformer battles, scores random 0.970 [0.953,0.985], heuristic 0.755 [0.710,0.797], guarded 0.815 [0.772,0.855]. GRU control heuristic 0.858 / guarded 0.833. Transformer not promoted; recorded counterfactual evidence favors retaining GRU while the coverage adaptation is evaluated. Exact reports and frozen snapshots are in transformer-20260929/. Active 1350-over-50 objective remains unmet.
+
+
+**Coverage adaptation first result (20k new battles):** GRU parent vs adapted scores: heuristic 0.890 -> 0.9025, guarded 0.9225 -> 0.9050, empirical-human 0.8950 -> 0.8975 (200 paired seeds each; confidence intervals overlap). No convincing gain, so no ladder promotion from this snapshot. The run is confirmed live toward 60k additional battles. Driver stage labels inherited a transformer prefix from the reused runner; the model manifest and checkpoints specify a GRU. Label spelling corrected in the report/source, with compatibility normalization on restart; the live process may write the old spelling until its final result is normalized. Ladder audit latest 1163 over 159 rated games on the current account, no qualifying 1350/50 window. Goal remains active.
+
+
+**1350 goal continuation: search memory correction.** Found in shared searchDecision that each root candidate was applied without advancing the learner GRU through the root observation. Fixed source to carry prediction.hidden into accepted cloned branches. TypeScript compiled successfully to an isolated runtime, leaving public ladder dist unchanged. Started old/fixed paired search evaluation (60 games each, same seeds/teams/policy/settings, v2 view, 2 workers each), PIDs 79946 / 79947, manifest and per-seed output under search-memory-1350-20260929/. Both runtimes fit opponent data only from 458 training-source rooms. Coverage adaptation still confirmed live toward 60k. Goal remains unmet; no promotion claimed.
+
+
+**Search correction comparison and rated trial queued:** 60 paired seeds, old search .900, fixed search .967, plain .933 with exactly matching plain outcomes. Fixed-old +.0667, approximate paired 95% CI [-.0122,+.1455], inconclusive. Extension to 200 total paired seeds running (140 additional), PIDs 80382/80383. Fixed search variant 2492d5913582 registered and queued after the current h5v2 plain-GRU trial, 60 rated games in isolated fixed runtime; original h5 search trial retained afterward. Dispatcher updated for per-account deduplicated rated counts and runtime selection, restarted as PID 80493 while preserving the active ladder client PID 80261. Latest audited Elo 1233; goal 1350 over 50 remains unmet. Coverage adaptation confirmed live at 52,216 additional battles toward 60k.
+
+
+**Field-header correction experiment:** Found that legacy packState writes opponent Reflect/Light Screen/Tailwind/Safeguard at 32..35 before overwriting them with the first Pokemon feature block. Added opt-in CHAMPIONS_FEATURES=3: six VGC field effects per side in global slots 20..31, replacing legacy hazard flags. Controlled encoding diagnostic: legacy changes no slots when the four effects are added; v3 changes 26/27/29/30 and leaves Pokemon features identical. Compiled isolated runtime, started fields-v3-1350-20260929 PID 80947, 64-GRU warm-start from h5v2 parent, stages20k/60k, same clean source split and held-out suite. Startup inference parity passed. Coverage adaptation completed60k: parent/adapted heuristic .890/.8925, guarded .9225/.900, human .895/.9075; no convincing gain, not promoted. Search200-seed extension remains running; current ladder rating audited1160. Goal remains active and unmet.
+
+
+**Search200-seed comparison complete:** plain .960, old search .930, corrected search .950. Plain outcomes match all200 paired seeds. Fixed-old +.020 (approx95%CI [-.0238,+.0638]); fixed-plain -.010 ([-.0493,+.0293]). Neither improvement is established. Corrected search remains an experimental rated trial, not a demonstrated stronger policy. Full per-seed evidence and comparison-200.json are saved. Field-header v3 adaptation continues.
+
+
+**Visible boost correction (feature v4):** Found monFeatures ignores pokemon.boosts on opposing VisibleMon entries and evasion slot40 overlaps species hashing. Opt-in v4 reads opposing observed types/boosts; packs seven boosts at33..39; resets boosts on real switches and handles Haze clear-all. Isolated boosts-v4-1350-20260929 compiled and is confirmed running, PID81736, 10,152 new battles; startup parity passed. Controlled live-view diagnostic changed slots449/455 for opposing attack/evasion, preserved species hash, and clear-all restored attack0. Fields-v3 first20k scores heuristic .8625, guarded .8950, human .8775 vs parent .890/.9225/.895; no promotion. Also corrected cross-side nickname collisions in human-behaviour.py HP tracking: fitting the same458 training rooms produces3496 rows and changes5/9 conditional rate cells. Side-aware rates saved separately for future use; active frozen experiments unchanged. Goal remains active and unmet.
+
+
+**Setup-aware opponent and v4 rated trial:** Audit of458 training rooms:296/3258 human move events (9.1%) are setup/field-control. Fitted setup rates conditional on820 rows belonging to Pokemon with observed setup moves; names limited to19 observed moves, held-out80 rooms excluded. New pilot respects move availability/current fields/capped boosts and side-aware HP. Rollout audit100 games per pilot: selected setup actions legacy4/771 (0.52%), new100/785 (12.74%); learner wins87/88, so increased strength is not established. Setup-human-v4 adaptation from the frozen v4@20k checkpoint is confirmed running PID82953, 32,176 new battles, parity passed, stages20k/60k. Registered plain v4@20k ladder variant c511fb10a630; queued60 rated games in its frozen runtime with explicit feature4. Current old h5v2 trial is6-9 after15 rated games, capped at24 to allocate evaluation to the corrected-input candidate. Dispatcher83347 confirmed live; current client83186 preserved. The corrected-search trial remains afterward. Goal remains active and unmet.
+
+
+**Corrected-feature runs completed:** fields-v3@60k heuristic .8625, guarded .9000, human .9175 (parent .890/.9225/.895); boosts-v4@60k .885/.895/.8975 (v4@20k .900/.9125/.910). No decisive gain from longer training. The registered v4@20k trial remains the selected corrected-input candidate. Setup-aware adaptation@20k scores .905/.910/.915 vs its parent .900/.9125/.9125 on the new pilot, no convincing improvement; confirmed live toward60k. Latest audited rating1125, no1350-over50 window.
+
+## Contextual opponent integration — 2026-09-29
+
+- Goal remains 1350 sustained over 50 rated battles. Last audited current account: 184 rated battles, latest 1087; no qualifying streak.
+- Setup-aware adaptation finished 60k: heuristic .877, guarded .900, human .9225; parent .900/.9125/.9125. Human-pilot gain accompanies regressions elsewhere, so no promotion.
+- Corrected behavior fitting to use turn-start HP. Added opt-in public-context opponent forecast and routed public views through rollout/evaluation/search callers. Isolated TypeScript compilation succeeded; shared ladder runtime untouched.
+- Context forecast held-out NLL .87163 versus 1.00840 bucket baseline. Initial 100-pair parent evaluation launched in isolated runtime (PID 85749). Category forecasting improvement is not Elo evidence; extraction count difference remains to audit.
+
+Context parent screening completed: 800 battles, zero truncations/aborts; random .985, heuristic .870, guarded .905, contextual human .920. No evidence yet that the contextual opponent is stronger; audit extraction differences before a costly adaptation run.
+
+## Complete-log correction and contextual adaptation
+
+The older behavior extractor kept incomplete early duplicate logs. Explicit raw-source selection restores 395 net decisions; both extractors now yield 3891 on 458 rooms. Rebuilt behavior rates and launched frozen contextual GRU adaptation at 20k/60k stages. Latest audited Elo 1110 after185 rated games; goal unmet.
+
+Contextual adaptation confirmed live (driver86085, trainer86168): 2352 completed battles at29.75seconds. Corrected-input ladder checkpoint c511fb10a630 is active; latest account rating1132 after186 rated battles.
+
+## Contextual adaptation first checkpoint
+
+20k completed and evaluated on200 paired seeds: parent heuristic .900, guarded .9125, contextual human .885; adapted .8725/.9025/.900. Paired bootstrap comparison saved in human-context-1350-20260929/comparison-20000.json. No convincing broad gain; no promotion. Driver86085 and trainer86638 confirmed live for60k stage. Latest audited Elo1115 after189 rated games; goal unmet.
+
+## Live training and rated loss collection
+
+Contextual trainer86638 confirmed live:29392 total completed adaptation battles. Corrected team-source selection to prefer full duplicate snapshots. Audit finds no additional revealed moves in the original538-team dataset, so this fix does not revise its current contents. New extraction includes574 source battles (36 additional); current frozen training unchanged. Two corrected-input rated losses recorded in human-context-1350-20260929/rated-loss-cases.json for future matchup diagnostics: Fake Out interruption and double attacks into Protect followed by losses to boosted faster attackers. These are observations, not proofs of optimal alternative actions.
+
+## Refreshed matchup screening
+
+574-source dataset reconstructed with1960 train packs and79 unique held-out packs from80 source rooms. Source-room and pack disjointness confirmed. Parent vs context20k on100 paired seeds: heuristic .850→.875, guarded .820→.890, contextual human .945→.875. Mixed transfer, no promotion. Data-refresh-20260929/comparison.json stores paired bootstrap differences. Contextual trainer86638 confirmed live at43800 completed battles; goal remains unmet.
+
+## Matched recurrent architecture comparison
+
+Launched fresh attention encoder plus GRU memory versus fresh MLP-GRU control. Both use seed20261351, featurev4, identical updated1960-team training data, contextual opponent/mix/PPO settings, one rolloutworker/oneTorchthread, and20k/60k/100k stages. Attention uses one64-wide layer, fourheads,13tokens. Evaluation uses200 paired seeds and79 unique packs from80 held-out source rooms. Frozen runtime/source/input hashes saved per manifest. Drivers87470/87477 and trainers87525/87528 confirmed live. Existing contextual warm-start adaptation continues separately. This comparison keeps temporal memory and matches training history; no rated promotion yet.
+
+## Contextual60k completed and queued for rated comparison
+
+Original held-out scores parent→60k: heuristic .900→.910, guarded .9125→.9125, human .885→.9075. Refreshed screening: heuristic .850→.875, guarded .820→.900, human .945→.915. Evidence mixed, but broad recovery versus20k supports a rated trial. Frozen contextual60k variant 7d0c790aedb4 queued for60 games following corrected-input candidate, capped at24. Architecture comparison remains live. Latest audited account Elo1135 after194 rated battles; no1350 streak.
+
+Matched architecture experiment inputs audited: identical non-architecture PPO arguments, seed, training/evaluation team contents and policy pool. Both trainers confirmed live. Runtime throughput and completed-battle counts saved in architecture-comparison-progress.json; no architecture-strength conclusion yet.
+
+## Matched architecture20k results
+
+Fresh MLP-GRU vs attention-GRU under matched recipe: heuristic .835 vs.745, guarded .870 vs.7625, contextual human .845 vs.7825. Paired bootstrap results in architecture-comparison-20000.json; one training seed limits architecture generalization. Attention underperforms at20k; both runs continue toward60k/100k rather than promoting either fresh checkpoint. Latest audited Elo1158 after197 rated battles; no1350 streak.
+
+## Ladder queue preserves qualifying goal streaks
+
+Auditor now reports current qualifying streak and exact checkpoint/team/temperature. Queue uses that verified state to prioritize the current qualifying configuration and extend its trial until50 qualifying battles, and stops once the independent audit proves success. Ordinary trial caps still apply below1350. Game counting now distinguishes temperature. Replaced daemon83347 with88649 while leaving active online client88567 running. New daemon confirmed live and waits for the same existing client; no duplicate ladder client launched. Current audited Elo1180 after198 rated battles; zero qualifying streak, goal remains active.
+
+## Fresh GRU control60k completed
+
+At60k: heuristic .855, guarded .8375, contextual human .870. Versus20k: heuristic +.020, guarded -.0325, human +.025; paired intervals saved in matched-gru-20260929/comparison-20k-60k.json. No decisive promotion case. Control continues toward100k (trainer89617); attention trainer88426 remains live toward60k. Latest audited Elo1199 after201 rated games, zero qualifying streak.
+
+## Bulk-spread team screening
+
+Current team has maximumSpeed on Curse Snorlax and Torkoal. Created four legal variants preserving species/moves/items. Snorlax-defense variant also gives Torkoal HP32/SPA32/DEF2 Modest; Snorlax gets ATK32/DEF32/HP2 Impish. Original→variant scores on100 paired seeds: heuristic .860→.865, guarded .810→.845, human .875→.905. Screening gains are small and include selection over several variants; no promotion. Fresh200-seed confirmation launched. Frozen architecture runs and live ladder unchanged.
+
+## Bulk team fresh-seed confirmation and rated trial
+
+200 fresh paired seeds: original→bulk heuristic .845→.870, guarded .8825→.900, human .8725→.8875. Guarded/human paired intervals include zero; modest transfer, not Elo proof. All3200 confirmation battles completed. Frozen bulky team queued for60 rated games using unchanged c511fb10a630 checkpoint and its original featurev4 runtime after current24-game trial; contextual60k follows afterward. Team change kept separate from policy change. Latest audited Elo1138 after203 games, goal unmet.
+
+## Matched recurrent architectures at60k
+
+MLP-GRU vs attention-GRU: heuristic .855 vs.7625; guarded .8375 vs.8275; contextual human .870 vs.850. Attention closed most guarded/human gap since20k but still trails substantially against heuristic. Paired bootstrap intervals in architecture-comparison-60000.json; one training seed. Both continue to100k (trainers89617/90236). No fresh model promotion. Latest audited Elo1161 after204 rated games; goal unmet.
+
+## Fresh GRU100k terminal result
+
+Control driver87477/trainer89617 finished100k and disappeared after successful completion. Final heuristic .7975, guarded .8125, contextual human .8125; regression from60k. Paired60k→100k intervals saved in matched-gru-20260929/comparison-60k-100k.json. No promotion or restart. Attention trainer90236 remains live toward100k. Current online client90625 confirmed live after original24-game sample; verify bulk configuration from its saved summary when available. More training under this recipe has not produced a stronger final checkpoint.
+
+## Final GRU temperature diagnostic
+
+100 fresh paired seeds: temperature1/.5/0 human scores .770/.825/.835; heuristic .815/.810/.810; guarded .835/.830/.830. Lower temperature helps against contextual pilot without recovering other regressions. Paired intervals saved in temperature-100k-20260929/comparison.json. No promotion. Bulk team68311aec9888 now has its first rated win recorded on unchanged c511 policy; audited account1114 after208 games. Attention trainer90236 remains live at81992 completed battles.
+
+## Expert-rating coverage audit
+
+Saved opponent-rating-coverage.json: original458 human training rooms have median1101 and zero opponents at1300+. All574 extracted source rooms contain only two1300+ opponents and none1350+; current refreshed80-room held-out set has one1300+ opponent. Therefore reconstructed-team volume does not supply expert human decisions at the target rating. This limits the empirical pilot as a proxy for1350 play. Bulk team is2–1 on first3 rated games; latest account1111 after210 games. Attention trainer90236 remains live.
+
+## Search-based synthetic adversary screening
+
+30 paired seeds on79 held-out reconstructed human team packs: opponent plain policy scored .0333 versus .3667 with rollout search against current c511GRU on bulky team. This is a privileged local teacher: full cloned synthetic battle state, same learned policy models future play,10 root candidates ×4 rollouts ×4-turn horizon, greedy searchQ with prior tie-breaking. It is not a rated Elo estimate. Extension to100 pairs launched to confirm stronger opposition before adding a training route. No online inference changes.
+
+## Architecture comparison complete; synthetic adversary confirmed
+
+At100k, attention-GRU vs matchedMLP-GRU: heuristic .790 vs.7975, guarded .8775 vs.8125, human .8925 vs.8125. Paired intervals in architecture-comparison-100000.json; one training seed, final-checkpoint comparison does not establish superiority over every earlier GRU checkpoint. Frozen attention variant 659d0a8a9a0e queued for60 rated games after bulk-team trial, original training team and temperature1. Both architecture drivers successfully terminal. Search opponent confirmed on100 paired held-out-team seeds: plain .08 vs search .36, delta .28, paired95 interval [.19,.37]. Full synthetic-state privilege is documented; no Elo inference. This is a candidate stronger local training opponent. Latest audited Elo1140 after213 games; goal unmet.
+
+## Search opponent PPO integration and400-stage pilot
+
+Implemented training-only DirectGame search route producing standard public learner episodes, configured frozen search teacher via environment. Added learning-rate CLI with prior3e-4 default retained; pilot uses6e-5. Isolated runtime compilation succeeded. Warm-started c511weights on bulky team,1960 training variants, mix40% search/20% human/20% guarded/10% selfplay/10% pool.400 battles completed and200-seed evaluation: heuristic .870→.865, guarded .900→.8975, human .8875→.895; no decisive gain. Driver92347 and trainer92552 confirmed live toward4000, then12000. Latest audited account1174 after217 rated battles; goal unmet.
+
+## Search adaptation repair — 2026-09-29 23:28 UTC
+
+Original search adaptation stopped after1720 completed games on whole-action retry exhaustion in rollouts. Its runtime remains frozen. A separate search-adapt-joint-20260929 resumes checkpoint/optimizer/counters using whole joint action rejection; confirmed live and past stopping count. Parent and400 checkpoint probes completed200 pairs under repaired runtime: learner scores against search teacher .760/.730; no demonstrated adaptation gain. Attention-GRU100k probe started on same200 seeds and bulk team; comparison has different training budget/initialization, and teacher models each learner current policy. Latest goal audit221 rated on current account, Elo1119, zero1350 streak.
+
+## Attention search comparison — 2026-09-29
+
+Completed200 paired seeds versus parent on same bulk team; different training histories and teacher forecasts each learner actual policy. {"plain": {"parentLearnerScore": 0.94, "attentionLearnerScore": 0.925, "delta": -0.015, "pairedBootstrap95ci": [-0.065, 0.035]}, "search": {"parentLearnerScore": 0.76, "attentionLearnerScore": 0.625, "delta": -0.135, "pairedBootstrap95ci": [-0.21, -0.06]}} No Elo inference; preserve rated attention trial.
+
+## Search adaptation4000 — 2026-09-29
+
+Repaired run completed cumulative4000-stage training and standard held-out evaluation; now training toward12000. Frozen4000 checkpoint started200-pair search-teacher comparison under same runtime/seeds/team as parent. {"gru-parent": {"random": 0.9775, "heuristic": 0.87, "guarded": 0.9, "human": 0.8875}, "gru-4000": {"random": 0.98, "heuristic": 0.885, "guarded": 0.905, "human": 0.9125}}
+
+## Completed4000 teacher comparison
+
+{"pairs": 200, "direction": "4000 learner minus parent", "limitation": "Frozen teacher policy models current learner; synthetic privileged search, not Elo.", "opponents": {"plain": {"parentLearnerScore": 0.94, "adaptedLearnerScore": 0.95, "delta": 0.01, "pairedBootstrap95ci": [-0.025, 0.05]}, "search": {"parentLearnerScore": 0.76, "adaptedLearnerScore": 0.75, "delta": -0.01, "pairedBootstrap95ci": [-0.08, 0.06]}}} Standard held-out paired intervals also include zero for every opponent. No4000 ladder promotion; continue12000 stage before further selection.
+
+## Longer teacher horizon benchmark
+
+{"pairs": 100, "shortTeacherScore": 0.27, "longTeacherScore": 0.26, "teacherDelta": -0.01, "pairedBootstrap95ci": [-0.1, 0.08], "plainIdentical": true, "limitation": "Same seeds and policies but horizon changes rollout RNG consumption. Privileged synthetic teacher, not Elo."}
+
+## Targeted support training pilot
+
+137 legal support-stat variants from27 training-source rooms (5Decorate rooms,22Coaching rooms), with moves/items retained and zero held-out pack overlap. Search teacher support-challenge100 paired seeds score .390 vs plain .060, delta .330 CI[.240,.420];34 search battles attempted support moves. Training-source challenge only. New search-support-adapt-20260929 uses29.55% targeted team sampling, frozen parent warm start and new optimizer, new seed20261353, stages400/4000, independent held-out seed4112000000.400 checkpoint guarded score .9075 vsparent .8775, paired+.030 CI[.0075,.055]; other standard opponent deltas nearzero. No ladder promotion;4000 held-out and support challenge pending.
+
+## Legal ally-target candidate fix
+
+Found Decorate normal target and HealPulse any target lacked ally candidates in moveOptions; engine validTargetLoc permits adjacent ally for normal and non-self ally for any. Added legal living-ally candidates and ally type effectiveness in shared generator; compiled isolated ally-target runtime. Existing frozen training/ladder runtimes retained. Original support benchmark counts attempts, including opponent-targeted Decorate, and does not establish ally support coordination. New100-pair support-challenge-ally benchmark counts actor/target side separately. Early support400 guarded gain did not reproduce on fresh200 seeds (both .9025); no promotion.
+
+## Support candidate and heuristic corrections
+
+Stopped old support-training run, preserving checkpoints, because Decorate could not target allies. Completed ally-targetv1 diagnostic: {"pairs": 100, "plainTeacherScore": 0.43, "searchTeacherScore": 0.91, "teacherDelta": 0.48, "pairedBootstrap95ci": [0.38, 0.58], "allySupportAttempts": {"plain": 79, "search": 79}, "limitation": "Ally-target candidate fixv1. Later v2 heuristic/human setup corrections compiled separately and not evaluated here. Training-source diagnostic, not Elo."} Added negative heuristic score for ally damage (PollenPuff excepted) and opponent-targeted Decorate, plus human setup eligibility/ranking for ally Decorate; compiled ally-target-v2-20260930 isolated runtime. New corrected support training still pending.
+
+## 12000-stage rated trial
+
+General search adaptation completed. Initial200 paired seed heuristic+.0325 CI[.0025,.0625],human+.0375 CI[.0075,.0675]; fresh200 confirmsheuristic+.035 CI[.0075,.065],guarded+.0325 CI[0,.065],human+.005 CI[-.030,.040]. Search teacher200 pairs learner .775 vsparent .760, delta+.015 CI[-.055,.080], no demonstrated teacher gain. Queued exploratory60-game plain-policy trial with bulk team and original frozen joint-retry/runtime feature4. Unique ladder metadata SHA preserves configuration provenance. Current client preserved; starts next session. No Elo or goal success inferred from local results.
+
+## Support-v3 correction and current execution
+
+Unrestricted normal/any ally-damage candidates collapsed parent held-out scores (.1275heuristic/.165guarded/.125human);16 diagnostic battles selected51/195 positive-power ally-target move components. Stopped v2training and preserved artifacts. Shared generator now offers ally-target normal/any status moves and PollenPuff healing, omitting general friendly-damage combinations pending explicit curriculum. New frozen search-support-v3-20260930 control .885heuristic/.890guarded/.8875human,400 checkpoint .895/.890/.8625; no promotion. Training continues4000 and support-student-v3-4000 comparison waits for frozen checkpoint. V3support challenge100pairs plain .070/search .320, paired+.250 CI[.160,.340],45 search ally-support attempts. General12000 checkpoint registered for exploratory60game ladder trial following current session; metadata0e268760e968f5430425e1167ebda920be03bcd4b68c500e4ed70036e710beb0.
+
+## Preview diagnostic and support-v3 stage completion
+
+Preview oracle100 pairs retained ArcanineFloette leads98cases; scores+.02/plain CI[-.03,.07],+.04/search CI[-.04,.12]. No clear gain; no preview behavior change. Support-v3 completed4000, standard held-out deltas {"random": {"delta": -0.005, "pairedBootstrap95ci": [-0.02, 0.01]}, "heuristic": {"delta": 0.005, "pairedBootstrap95ci": [-0.0225, 0.035]}, "guarded": {"delta": -0.005, "pairedBootstrap95ci": [-0.035, 0.0225]}, "human": {"delta": 0.0075, "pairedBootstrap95ci": [-0.025, 0.04]}}; no demonstrated broad gain. Targeted challenge comparison retained separately.
+
+## Search imitation, team and joint-head experiments
+
+160 teacher trajectories128train/32validation source rooms,862public-state decisions/602search labels. Full imitation validation NLL3.269→2.671 but accuracy.723→.607; fresh200 held-out heuristic delta-.0325 CI[-.0575,-.010]. No promotion. Advantage>.05 fit71train/16validation labels, stronger KL2.0; heuristic-.0375 CI[-.065,-.010], no promotion. Public replay API returned403; no external expert replays acquired. RockHead variant200pairs no clear gain vsIntimidate; kept original ability. Matched joint-head/control warm adaptations launched from12000 parent with same training seed20261355 and corrected support pool; residual zero-output head adds4225parameters.400 paired-stage comparison all gain intervals includezero. Both continue4000; current rated12000 policy trial remains separate.
+
+## Update 2026-09-30 (encoder audit): weather/terrain blindness found and fixed (view v3)
+
+- `scripts/view-audit2.mjs` compares `VisibleState` with simulator truth per turn. v2: weather wrong 107/454 (parsed `[from]`/`[upkeep]` text instead of the weather name), terrain wrong 67/454 (never recognised), Light Screen stored as `movelightscreen`, foe boosts wrong 67/770 (not reset on switch). Cause: Showdown puts the name in the first argument for `-weather`/`-fieldstart`/`-fieldend`; the parser read the second.
+- Fix: `CHAMPIONS_VIEW=3` (`receiveField`, boost reset on switch). Audit after: terrain/room/side conditions 0 mismatches, weather 2/454 (naming only), own boosts 0/714.
+- Consequence: every policy so far never saw weather, terrain, Trick Room, Gravity or Tailwind/Reflect/Light-Screen status of Showdown-formatted messages. Species that set these (Tyranitar 80%, Politoed 67%, Excadrill 70%, Indeedee 70%, Charizard 70% opponent win rate vs us) are among our worst matchups. This is the strongest explanation found so far for local strength not transferring.
+- `humanclimb7-20260929` (CHAMPIONS_VIEW=3): two GRUs warm-started from h5v2-team1a plus one from scratch, mix human 0.5 / heuristic 0.05 / selfplay 0.25 / pool 0.2, stages 20k-100k. Evaluate with `CHAMPIONS_VIEW=3`. Ladder queue takes a per-entry `"view"` key.

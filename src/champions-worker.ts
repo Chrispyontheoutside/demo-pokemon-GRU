@@ -1,8 +1,10 @@
+import {DirectGame} from './direct-battle.js';
+import {HUMAN_CONTEXT_NAMES, HUMAN_KINDS, humanContextFeatures, humanContextProbabilities, type HumanContextModel} from './human-context.js';
 import {readFileSync} from 'node:fs';
 import {createInterface} from 'node:readline';
 import {pathToFileURL} from 'node:url';
 import showdown from 'pokemon-showdown';
-import {ACTION_DIM, CHAMPIONS_ENGINE_VERSION, CHAMPIONS_FORMAT, encode, heuristic, potential, STATE_DIM, VisibleState, type Candidate, type Encoded, type SideId} from './champions.js';
+import {ACTION_DIM, CHAMPIONS_ENGINE_VERSION, CHAMPIONS_FORMAT, encode, FEATURES_V3, FEATURES_V4, heuristic, potential, STATE_DIM, VGC_FIELD_EFFECTS, VisibleState, type Candidate, type Encoded, type SideId} from './champions.js';
 
 const {BattleStream, getPlayerStreams, Teams, TeamValidator, Dex, toID} = showdown;
 export const CHAMPIONS_TEAM_GENERATOR_VERSION = 'm-c-statpoints-v1';
@@ -142,7 +144,7 @@ export function makeTeam(seed: number[]) {
 type Tensor = number[] | number[][];
 export interface Checkpoint {
   schema: number; format: string; engineVersion: string; switchExploration?: number; modelArchitecture?: string; transformerLayers?: number; transformerHeads?: number; stateDim: number; actionDim: number;
-  steps: number; selfPlayBattlesGenerated: number; simpleScoreWeight?: number;
+  steps: number; selfPlayBattlesGenerated: number; simpleScoreWeight?: number; jointHeadResidual?: boolean;
   weights: Record<string, Tensor>;
 }
 function dense(x: number[], weights: number[][], bias: number[], tanh = false) {
@@ -176,12 +178,16 @@ export class Policy {
   private readonly deepState: boolean;
   private readonly transformer: boolean;
   private readonly transformerLayers: number;
+  private readonly jointHead: boolean;
   constructor(readonly checkpoint: Checkpoint) {
+    if (checkpoint.jointHeadResidual !== undefined && typeof checkpoint.jointHeadResidual !== 'boolean') throw new Error('Invalid residual joint-head flag');
+    this.jointHead = checkpoint.jointHeadResidual === true;
     if (checkpoint.schema !== 1 || checkpoint.format !== CHAMPIONS_FORMAT || checkpoint.engineVersion !== CHAMPIONS_ENGINE_VERSION || checkpoint.stateDim !== STATE_DIM || checkpoint.actionDim !== ACTION_DIM) throw new Error('Incompatible Champions checkpoint');
     const gruNames = ['candidate-conditioned-gru-v1', 'candidate-conditioned-gru-v2', 'candidate-conditioned-gru-v3-transformer'];
     const ffNames = ['candidate-conditioned-v2', 'candidate-conditioned-v3', 'candidate-conditioned-v4', 'candidate-conditioned-v5-transformer'];
     this.recurrent = gruNames.includes(checkpoint.modelArchitecture ?? '');
     this.candidateConditioned = ffNames.includes(checkpoint.modelArchitecture ?? '') || this.recurrent;
+    if (this.jointHead && !this.candidateConditioned) throw new Error('Residual joint head requires a candidate-conditioned policy');
     this.boundedValue = ffNames.filter(name => name !== 'candidate-conditioned-v2').includes(checkpoint.modelArchitecture ?? '') || this.recurrent;
     if (checkpoint.modelArchitecture !== undefined && ![...gruNames, ...ffNames].includes(checkpoint.modelArchitecture)) throw new Error(`Unsupported Champions policy architecture: ${checkpoint.modelArchitecture}`);
     this.transformer = ['candidate-conditioned-v5-transformer', 'candidate-conditioned-gru-v3-transformer'].includes(checkpoint.modelArchitecture ?? '');
@@ -204,6 +210,7 @@ export class Policy {
     }
     if (this.recurrent) Object.assign(dims, {'memory.weight_ih':[3*this.hiddenSize,this.hiddenSize], 'memory.weight_hh':[3*this.hiddenSize,this.hiddenSize], 'memory.bias_ih':[3*this.hiddenSize], 'memory.bias_hh':[3*this.hiddenSize]});
     if (this.deepState) Object.assign(dims, {'state2.weight':[this.hiddenSize,this.hiddenSize], 'state2.bias':[this.hiddenSize]});
+    if (this.jointHead) Object.assign(dims, {'joint_hidden.weight':[this.hiddenSize,this.hiddenSize], 'joint_hidden.bias':[this.hiddenSize], 'joint_score.weight':[1,this.hiddenSize], 'joint_score.bias':[1]});
     for (const [name, [rows, cols]] of Object.entries(dims)) {
       const data = checkpoint.weights[name];
       if (!Array.isArray(data) || data.length !== rows || (cols && data.some(row => !Array.isArray(row) || row.length !== cols)) || data.flat().some(x => typeof x !== 'number' || !Number.isFinite(x))) throw new Error(`Invalid checkpoint tensor ${name}`);
@@ -253,7 +260,8 @@ export class Policy {
       ? encoded.candidates.map(candidate => {
         const actionHidden = (w['action.weight'] as number[][]).map((row, i) =>
           Math.tanh(hidden[i] + (w['action.bias'] as number[])[i] + candidate.features.reduce((n, x, j) => n + x * row[j], 0)));
-        return (w['score.weight'] as number[][])[0].reduce((n, x, i) => n + x * actionHidden[i], (w['score.bias'] as number[])[0]) + scoreWeight * candidate.simpleScore;
+        const residual = this.jointHead ? dense(dense(actionHidden, w['joint_hidden.weight'] as number[][], w['joint_hidden.bias'] as number[], true), w['joint_score.weight'] as number[][], w['joint_score.bias'] as number[])[0] : 0;
+        return (w['score.weight'] as number[][])[0].reduce((n, x, i) => n + x * actionHidden[i], (w['score.bias'] as number[])[0]) + residual + scoreWeight * candidate.simpleScore;
       })
       : encoded.candidates.map(candidate => {
         const context = dense(hidden, w['action.weight'] as number[][], w['action.bias'] as number[]);
@@ -310,7 +318,7 @@ function prng(seed: number) {
 }
 
 export interface Choice {action: number; logp: number; value: number; choice: string; entropy?: number; nextHidden?: number[]}
-export async function play(seed: number, choose: (side: SideId, encoded: Encoded, hidden?: number[], request?: any) => Choice, maxTurns = 200, trace = false, fixedTeams: Partial<Record<SideId, string>> = {}): Promise<GameResult> {
+export async function play(seed: number, choose: (side: SideId, encoded: Encoded, hidden?: number[], request?: any, view?: VisibleState) => Choice, maxTurns = 200, trace = false, fixedTeams: Partial<Record<SideId, string>> = {}): Promise<GameResult> {
   const stream = new BattleStream();
   const streams = getPlayerStreams(stream);
   const lo = seed & 65535, hi = (seed >>> 16) & 65535;
@@ -348,7 +356,7 @@ export async function play(seed: number, choose: (side: SideId, encoded: Encoded
         trajectories[side].pop();
         memories[side] = last.memoryBefore;
         if (last.requestKey === requestKeys[side]) {
-          for (const part of last.choice.split(',').map(value => value.trim())) rejectedParts[side].add(part);
+          rejectedParts[side].add(last.choice)
         }
         lastChoices[side] = undefined;
         if (retries > 50) throw new Error(`Too many rejected choices in Champions battle ${seed}`);
@@ -366,12 +374,12 @@ export async function play(seed: number, choose: (side: SideId, encoded: Encoded
         const encoded = encode(request, views[side], side);
         profile.encodeMs += performance.now() - encodeStart; profile.encodeCalls++;
         if (rejectedParts[side].size) {
-          encoded.candidates = encoded.candidates.filter(candidate => !candidate.choice.split(',').some(part => rejectedParts[side].has(part.trim())));
+          encoded.candidates = encoded.candidates.filter(candidate => !rejectedParts[side].has(candidate.choice));
           if (!encoded.candidates.length) throw new Error(`All encoded choices were rejected for ${side}: ${[...rejectedParts[side]].join('; ')}`);
         }
         const memoryBefore = memories[side];
         const chooseStart = performance.now();
-        const result = choose(side, encoded, memoryBefore, request);
+        const result = choose(side, encoded, memoryBefore, request, views[side]);
         profile.chooseMs += performance.now() - chooseStart; profile.chooseCalls++;
         if (result.nextHidden) memories[side] = result.nextHidden;
         lastChoices[side] = {choice:result.choice, requestKey, request, candidates:encoded.candidates,
@@ -412,7 +420,7 @@ export async function play(seed: number, choose: (side: SideId, encoded: Encoded
   }
 }
 
-type OpponentType = 'selfplay'|'heuristic'|'heuristic2'|'human'|'random'|'pool';
+type OpponentType = 'search'|'selfplay'|'heuristic'|'heuristic2'|'human'|'random'|'pool';
 const GUARD_MOVES = new Set(['protect', 'detect', 'kingsshield', 'spikyshield', 'banefulbunker', 'obstruct', 'silktrap', 'burningbulwark']);
 const hpOf = (condition: string | undefined) => { const m = /^(\d+)\/(\d+)/.exec(String(condition ?? '')); return m ? Number(m[1]) / Number(m[2]) : 1; };
 /**
@@ -448,11 +456,15 @@ export function guardedAction(encoded: Encoded, request: any, random: () => numb
  * from our own ladder logs (scripts/human-behaviour.py -> human-behaviour.json, keyed "turnBucket:hpBucket"), then take the highest-scoring
  * candidate that realises the sampled kinds. Humans switched about 4-10% per slot-turn almost independently of HP.
  */
-type Rates = {protect: number; fakeout: number; switch: number};
+type Rates = {protect: number; fakeout: number; switch: number; setup?: number};
 interface HumanBand {rows: number; focusFire: number; table: Record<string, Rates>}
-const HUMAN_DATA: {table: Record<string, Rates>; bands: Record<string, HumanBand>} = (() => {
+const HUMAN_DATA: {table: Record<string, Rates>; bands: Record<string, HumanBand>; setupMoveNames?: string[]} = (() => {
   try { return JSON.parse(readFileSync(new URL('../../runs/champions-vgc-2026-reg-mc/human-behaviour.json', import.meta.url), 'utf8')); } catch { return {table: {}, bands: {}}; }
 })();
+const HUMAN_CONTEXT: HumanContextModel | undefined = process.env.CHAMPIONS_HUMAN_CONTEXT ? JSON.parse(readFileSync(process.env.CHAMPIONS_HUMAN_CONTEXT, 'utf8')) : undefined;
+if (HUMAN_CONTEXT && (JSON.stringify(HUMAN_CONTEXT.features) !== JSON.stringify(HUMAN_CONTEXT_NAMES) || JSON.stringify(HUMAN_CONTEXT.kinds) !== JSON.stringify(HUMAN_KINDS))) throw new Error('Human-context model contract mismatch');
+const HUMAN_GUARDS = new Set([...GUARD_MOVES, 'wideguard', 'quickguard']);
+const HUMAN_SETUP_MOVES = new Set((HUMAN_DATA.setupMoveNames ?? []).map(name => formatDex.moves.get(name).id));
 /** Per-battle human style: a rating band (drawn by observed frequency), jittered rates, and a focus-fire preference. Cached per RNG (one per battle side). */
 interface HumanStyle {table: Record<string, Rates>; focus: number; sloppy: number}
 const styleCache = new WeakMap<object, HumanStyle>();
@@ -468,7 +480,7 @@ function humanStyle(random: () => number): HumanStyle {
   }
   const jitter = 0.7 + 0.6 * random();                     // this player is somewhat more or less Protect/switch-happy than the band average
   const scaled: Record<string, Rates> = {};
-  for (const [key, r] of Object.entries(table)) scaled[key] = {protect: r.protect * jitter, fakeout: r.fakeout, switch: r.switch * (2 - jitter)};
+  for (const [key, r] of Object.entries(table)) scaled[key] = {protect: r.protect * jitter, fakeout: r.fakeout, switch: r.switch * (2 - jitter), setup: r.setup};
   style = {table: scaled, focus: Math.max(0, Math.min(1, focus + 0.2 * (random() - 0.5))), sloppy: 0.02 + 0.13 * random()};
   styleCache.set(random, style);
   return style;
@@ -478,17 +490,48 @@ function humanStyle(random: () => number): HumanStyle {
  * focus-fire preference, occasional sloppy pick). Per active slot it samples Protect / Fake Out / voluntary switch / attack with the measured
  * conditional rates ("turnBucket:hpBucket"), then takes the highest-scoring candidate realising the sampled kinds and the target preference.
  */
-export function humanAction(encoded: Encoded, request: any, random: () => number): number {
+export function humanAction(encoded: Encoded, request: any, random: () => number, view?: VisibleState, side?: SideId): number {
   const style = humanStyle(random);
   const turn = Math.round((encoded.state[0] ?? 0) * 100);
   const turnBucket = turn <= 1 ? 0 : turn <= 3 ? 1 : 2;
   const slots = Math.max(1, request?.active?.length ?? 2);
   if (random() < style.sloppy) return Math.floor(random() * encoded.candidates.length);
+  const setupIds = (request?.active ?? []).map((active: any, slot: number) => new Set(active.moves.filter((option: any) => {
+    if (option.disabled || !HUMAN_SETUP_MOVES.has(option.id)) return false;
+    const move = formatDex.moves.get(option.id);
+    const fieldIndex = VGC_FIELD_EFFECTS.indexOf(move.sideCondition ?? '');
+    if (FEATURES_V3 && fieldIndex >= 0 && encoded.state[20 + fieldIndex]) return false;
+    if (move.id === 'auroraveil' && !encoded.state[11] && !encoded.state[12]) return false; // hail/snow
+    if (FEATURES_V4 && move.boosts) {
+      const stats = ['atk','def','spa','spd','spe','accuracy','evasion'];
+      const raised = Object.entries(move.boosts).filter(([, amount]) => Number(amount) > 0);
+      if (raised.length && !['self','adjacentAlly'].includes(move.target) && move.id !== 'decorate') return false;
+      const targetSlot = move.target === 'adjacentAlly' || move.id === 'decorate' ? 1 - slot : slot;
+      if (raised.length && raised.every(([stat]) => stats.includes(stat) && encoded.state[32 + targetSlot * 64 + 33 + stats.indexOf(stat)] >= 1)) return false;
+    }
+    return true;
+  }).map((move: any) => move.id)));
   const wanted: string[] = [];
   for (let slot = 0; slot < slots; slot++) {
     const hp = hpOf(request?.side?.pokemon?.[slot]?.condition), rates = style.table[`${turnBucket}:${hp < 0.35 ? 0 : hp < 0.7 ? 1 : 2}`];
     const u = random();
-    wanted.push(!rates ? 'move' : u < rates.protect ? 'protect' : u < rates.protect + rates.fakeout ? 'fakeout' : u < rates.protect + rates.fakeout + rates.switch ? 'switch' : 'move');
+    if (HUMAN_CONTEXT && view && side && !request?.forceSwitch && !request?.teamPreview && view.active[side].get(`${side}${slot ? 'b' : 'a'}`)) {
+      const probabilities = humanContextProbabilities(HUMAN_CONTEXT, humanContextFeatures(view, side, slot));
+      const available = new Set<string>();
+      for (const candidate of encoded.candidates) {
+        const tokens = candidate.choice.split(',')[slot]?.trim().split(/\s+/) ?? [];
+        const id = tokens[0] === 'move' ? request?.active?.[slot]?.moves?.[Number(tokens[1]) - 1]?.id : undefined;
+        available.add(tokens[0] === 'switch' ? 'switch' : HUMAN_GUARDS.has(id) ? 'protect' : id === 'fakeout' ? 'fakeout' : setupIds[slot]?.has(id) ? 'setup' : 'move');
+      }
+      const weights = probabilities.map((p, i) => available.has(HUMAN_KINDS[i]) ? p : 0);
+      let draw = u * weights.reduce((sum, p) => sum + p, 0);
+      let selected = 'move';
+      for (let i = 0; i < weights.length; i++) { draw -= weights[i]; if (weights[i] > 0 && draw <= 0) { selected = HUMAN_KINDS[i]; break; } }
+      wanted.push(selected);
+      continue;
+    }
+    const canSetup = setupIds[slot]?.size;
+    wanted.push(!rates ? 'move' : u < rates.protect ? 'protect' : u < rates.protect + rates.fakeout ? 'fakeout' : u < rates.protect + rates.fakeout + rates.switch ? 'switch' : canSetup && u < rates.protect + rates.fakeout + rates.switch + (rates.setup ?? 0) ? 'setup' : 'move');
   }
   const focusWanted = random() < style.focus;
   let best = 0, bestScore = -Infinity;
@@ -498,7 +541,8 @@ export function humanAction(encoded: Encoded, request: any, random: () => number
     const targets: string[] = [];
     parts.forEach((part, slot) => {
       const tokens = part.split(/\s+/), id = tokens[0] === 'move' ? request?.active?.[slot]?.moves?.[Number(tokens[1]) - 1]?.id : undefined;
-      const kind = tokens[0] === 'switch' ? 'switch' : GUARD_MOVES.has(id) ? 'protect' : id === 'fakeout' ? 'fakeout' : 'move';
+      const kind = tokens[0] === 'switch' ? 'switch' : (HUMAN_CONTEXT ? HUMAN_GUARDS : GUARD_MOVES).has(id) ? 'protect' : id === 'fakeout' ? 'fakeout' : setupIds[slot]?.has(id) && (id !== 'decorate' || Number(tokens[2]) < 0) ? 'setup' : 'move';
+      if (id === 'decorate' && Number(tokens[2]) > 0) score -= 20;
       if (kind === wanted[slot]) score += 10;      // realise the sampled kind; within it the damage heuristic decides
       if (kind === 'move' && Number(tokens[2]) > 0) targets.push(tokens[2]);   // 1/2 = the two foes
     });
@@ -522,17 +566,73 @@ function assignTeams(teams: TeamSets | undefined, seed: number, learnerSide: Sid
   else if (teams.opponent?.length && (teamHash(seed * 17 + 5) % 1000) / 1000 < (teams.opponentShare ?? 0.5)) fixed[other] = pick(teams.opponent, 4);
   return fixed;
 }
+let searchTeacher: Policy | undefined;
+/** Privileged synthetic opponent; learner trajectories contain only its public encoding. */
+async function runSearchBattle(model: Policy, seed: number, learnerSide: SideId, rngs: Record<SideId, () => number>, fixed: Partial<Record<SideId, string>>, maxTurns = 200) {
+  if (!searchTeacher) {
+    if (!process.env.CHAMPIONS_SEARCH_TEACHER) throw new Error('Search training requires CHAMPIONS_SEARCH_TEACHER');
+    searchTeacher = new Policy(JSON.parse(readFileSync(process.env.CHAMPIONS_SEARCH_TEACHER, 'utf8')));
+  }
+  const {act, searchDecision} = await import('./search.js');
+  const lo = seed & 65535, hi = seed >>> 16 & 65535;
+  const game = DirectGame.create([fixed.p1 ?? makeTeam([71,89,hi,lo]), fixed.p2 ?? makeTeam([72,89,hi,lo])], [17,29,hi,lo]);
+  const foe: SideId = learnerSide === 'p1' ? 'p2' : 'p1';
+  const agents = {[learnerSide]: model, [foe]: searchTeacher} as Record<SideId, Policy>;
+  const steps: Step[] = [];
+  let retries = 0, guard = 0;
+  while (!game.ended && game.views[learnerSide].turn < maxTurns && guard++ < 1000) {
+    for (const side of game.pending()) {
+      if (side === foe) {
+        if (game.requests[side]?.active) {
+          const result = searchDecision(game, side, agents, rngs[side], {topK:6,switchK:2,randomK:2,rollouts:4,maxTurns:4});
+          let best = 0;
+          for (let i = 1; i < result.q.length; i++) if (result.q[i] > result.q[best] || (result.q[i] === result.q[best] && result.prior[result.subset[i]] > result.prior[result.subset[best]])) best = i;
+          const hidden = searchTeacher.predict(result.encoded, undefined, game.hidden[side]).hidden;
+          if (game.choose(side, result.encoded.candidates[result.subset[best]].choice)) { game.hidden[side] = hidden; continue; }
+          retries++;
+        }
+        act(game, side, searchTeacher, rngs[side]);
+        continue;
+      }
+      const rejected = new Set<string>();
+      let accepted = false;
+      const maxAttempts = game.encodeFor(side).candidates.length + 1;
+      for (let attempt = 0; attempt < maxAttempts && !accepted; attempt++) {
+        const encoded = game.encodeFor(side), request = game.requests[side];
+        encoded.candidates = encoded.candidates.filter(candidate => !rejected.has(candidate.choice));
+        if (!encoded.candidates.length) throw new Error('No learner action remains against search opponent');
+        const prediction = model.choose(encoded, rngs[side], undefined, game.hidden[side], 1, Number(model.checkpoint.switchExploration ?? 0));
+        const choice = encoded.candidates[prediction.action].choice;
+        const boardPotential = potential(request, game.views[side], side);
+        accepted = game.choose(side, choice);
+        if (accepted) {
+          steps.push({state:encoded.state, actions:encoded.candidates.map(c => c.features), simpleScores:encoded.candidates.map(c => c.simpleScore),
+            action:prediction.action, logp:prediction.logp, value:prediction.value, entropy:prediction.entropy ?? 0, potential:boardPotential});
+          game.hidden[side] = prediction.nextHidden;
+        } else { retries++; rejected.add(choice); }
+      }
+      if (!accepted) throw new Error('Repeated learner action rejection against search opponent');
+    }
+  }
+  if (!game.ended && guard >= 1000) throw new Error('Search training battle stalled');
+  const winner = game.winner;
+  const result: GameResult = {winner, turns:game.views[learnerSide].turn, truncated:!game.ended, retries,
+    hiddenTrapReveals:0, illegalActionRetries:retries, rejectionDiagnostics:[],
+    episodes:[{steps, side:learnerSide, reward:winner === learnerSide ? 1 : winner ? -1 : 0}]};
+  return {result, learnerSide, episodes:result.episodes};
+}
 async function runBattle(model: Policy, baseSeed: number, i: number, opponentType: OpponentType, maxTurns?: number, debug?: boolean, poolPolicy?: Policy, teams?: TeamSets, poolName?: string) {
   if (opponentType === 'pool' && !poolPolicy) throw new Error('A pool battle needs an opponent policy');
   const rngs: Record<SideId, () => number> = {p1: prng(baseSeed + i * 2), p2: prng(baseSeed + i * 2 + 1)};
   const learnerSide: SideId = opponentType === 'selfplay' ? 'p1' : ((baseSeed + i) % 2 ? 'p1' : 'p2');
-  const result = await play(baseSeed + i, (side, encoded, hidden, request) => {
+  if (opponentType === 'search') return runSearchBattle(model, baseSeed+i, learnerSide, rngs, assignTeams(teams, baseSeed+i, learnerSide, false), maxTurns);
+  const result = await play(baseSeed + i, (side, encoded, hidden, request, view) => {
     let prediction: {action:number;logp:number;value:number;entropy?:number;nextHidden?:number[]};
     if (opponentType === 'selfplay' || side === learnerSide) prediction = model.choose(encoded, rngs[side], undefined, hidden, 1, Number(model.checkpoint.switchExploration ?? 0));
     else if (opponentType === 'pool') prediction = poolPolicy!.choose(encoded, rngs[side], undefined, hidden);
     else if (opponentType === 'heuristic') prediction = {action:heuristic(encoded),logp:0,value:0};
     else if (opponentType === 'heuristic2') prediction = {action:guardedAction(encoded, request, rngs[side]),logp:0,value:0};
-    else if (opponentType === 'human') prediction = {action:humanAction(encoded, request, rngs[side]),logp:0,value:0};
+    else if (opponentType === 'human') prediction = {action:humanAction(encoded, request, rngs[side], view, side),logp:0,value:0};
     else prediction = {action:Math.floor(rngs[side]() * encoded.candidates.length),logp:0,value:0};
     const candidate = encoded.candidates[prediction.action];
     return {...prediction, choice: candidate.choice};

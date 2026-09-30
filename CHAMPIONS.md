@@ -41,7 +41,7 @@ npm run train:champions -- --architecture gru --training-opponent mix \
 - `scripts/run-champions-league.sh <dir> "<stages>" <workers>` runs several experiments per `experiments.txt` line
   `name:arch:seed:init-checkpoint:opponent-mix:learner-team:extra-args`, snapshotting and evaluating per stage.
 - Throughput: ~90-105 battles/s per experiment, ~160 battles/s aggregate on a 10-core M5. Training is bit-exact reproducible across worker counts.
-- Set `CHAMPIONS_VIEW=2` for the corrected roster tracking (all new experiments should); the default (v1) matches existing checkpoints.
+- Set `CHAMPIONS_VIEW=3` (roster + field + boost fixes) for all new experiments; the default (v1) matches old checkpoints, v2 = roster fix only.
 
 ## Human-behaviour opponent (what "human local players" means)
 
@@ -70,7 +70,7 @@ frequencies over our logs); `src/ladder-search.ts` rolls out candidates over sev
 side's information:
 
 ```
-CHAMPIONS_VIEW=2 node scripts/ladder-search-eval.mjs --policy p.json --team t.json --opp-teams a.json,b.json --opp human --games 150 --jobs 3
+CHAMPIONS_VIEW=3 node scripts/ladder-search-eval.mjs --policy p.json --team t.json --opp-teams a.json,b.json --opp human --games 150 --jobs 3
 ```
 
 Enable on the ladder with `LADDER_SEARCH=1` (skipped on forced replacements and when reconstruction is not possible; notes go to `<room>.search.json`).
@@ -87,6 +87,13 @@ The registry freezes hash-keyed checkpoints and classifies endings (normal / ear
 excludes early-forfeit and timer wins. Account name lives in `.cache/champions-vgc-2026-reg-mc-ladder-user.json` (gitignored). Open Team Sheets are not accepted.
 
 ## Findings worth keeping
+
+- **Weather, terrain, Trick Room, Gravity and side conditions were invisible to every policy trained so far.** `scripts/view-audit2.mjs` (per-turn comparison of
+  `VisibleState` with simulator truth) showed weather wrong in 107/454 states (it stored `fromabilitydrizzle` / `upkeep`), terrain never recognised (67/454), and
+  Light Screen stored as `movelightscreen`; Showdown puts the field name in the first argument and the parser read the wrong one. Boosts also persisted after a
+  Pokémon switched out (67/770 foe states). `CHAMPIONS_VIEW=3` fixes all of it (audit: 0-2 mismatches, the remainder are naming). Opposing species that set
+  weather/terrain (Tyranitar, Politoed, Excadrill, Indeedee, Charizard) are exactly those with the highest opponent win rate against us (63-80%). New policies must be
+  trained with `CHAMPIONS_VIEW=3`; `CHAMPIONS_VIEW=1` reproduces old checkpoints.
 
 - `VisibleState` v1 looked in the departing slot first, so every switch or replacement renamed the departing roster entry; the opposing roster lost
   fainted and benched members (`scripts/view-audit.mjs`: fainted count wrong in 180/281 states; v2 wrong in 0). The old control policy scores the

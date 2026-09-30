@@ -1,6 +1,6 @@
 """Conditional human (opponent) behaviour rates from our own ladder battle logs.
 
-    python3 scripts/human-behaviour.py [--out runs/champions-vgc-2026-reg-mc/human-behaviour.json]
+    python3 scripts/human-behaviour.py [--rooms train-rooms.json] [--out human-behaviour.json]
 
 For every opponent active slot on every turn: hp bucket of that Pokemon, turn bucket, and what it did (move / protect / fake out /
 voluntary switch). Own battles only. Forced replacements after a faint are not voluntary switches.
@@ -14,10 +14,18 @@ rows = []
 focus = collections.defaultdict(lambda: [0, 0])   # band -> [same-target turns, two-attack turns]
 band_of = lambda r: 'low' if r < 1061 else 'mid' if r < 1145 else 'high'
 seen = set()
-for path in sorted(glob.glob('runs/champions-vgc-2026-reg-mc/ladder/*/battle-*.log')):
+allowed_rooms = set(json.load(open(sys.argv[sys.argv.index('--rooms') + 1]))) if '--rooms' in sys.argv else None
+setup_names = set(json.load(open(sys.argv[sys.argv.index('--setup-moves') + 1]))) if '--setup-moves' in sys.argv else set()
+if '--raw' in sys.argv:
+    source_records = json.load(open(sys.argv[sys.argv.index('--raw') + 1]))
+    paths = [f"runs/champions-vgc-2026-reg-mc/ladder/{r['observedAt']}/{r['room']}.log" for r in source_records]
+else:
+    # Multiple snapshots of one room exist; prefer the fullest saved log.
+    paths = sorted(glob.glob('runs/champions-vgc-2026-reg-mc/ladder/*/battle-*.log'), key=lambda path: (-__import__('os').path.getsize(path), path))
+for path in paths:
     room = path.split('/')[-1]
+    if allowed_rooms is not None and room.removesuffix('.log') not in allowed_rooms: continue
     if room in seen: continue
-    seen.add(room)
     lines = open(path).read().split('\n')
     players = {}
     for l in lines:
@@ -25,10 +33,13 @@ for path in sorted(glob.glob('runs/champions-vgc-2026-reg-mc/ladder/*/battle-*.l
         if len(p) > 3 and p[1] == 'player': players[p[2]] = p[3]
     opp = 'p2' if players.get('p1') in ME else 'p1' if players.get('p2') in ME else None
     if opp is None: continue
+    seen.add(room)
+    setup_users = {f"{p[2][:2]}:{p[2].split(': ')[-1]}" for p in (l.split('|') for l in lines)
+                   if len(p) > 3 and p[1] == 'move' and p[2][:2] == opp and p[3] in setup_names}
     rating_of = {q[3]: int(q[5]) for q in (l.split('|') for l in lines[:14]) if len(q) > 5 and q[1] == 'player' and q[5].isdigit()}
     band = band_of(rating_of.get(players.get(opp), 1100))
     turn_targets = {}
-    hp = {}; active = {}; turn = 0; acted = set(); fainted_slots = set(); last_protect = {}
+    hp = {}; decision_hp = {}; active = {}; turn = 0; acted = set(); fainted_slots = set(); last_protect = {}; forced_slots = set()
     for l in lines:
         p = l.split('|')
         if len(p) < 3: continue
@@ -37,36 +48,51 @@ for path in sorted(glob.glob('runs/champions-vgc-2026-reg-mc/ladder/*/battle-*.l
             if len(turn_targets) == 2:
                 focus[band][1] += 1; focus[band][0] += len(set(turn_targets.values())) == 1
             turn_targets = {}
-            turn = int(p[2]); acted = set(); fainted_slots = set()
+            turn = int(p[2]); acted = set(); fainted_slots = set(); forced_slots = set()
+            decision_hp = hp.copy()
         elif k in ('switch', 'drag') and len(p) > 4:
-            slot = p[2][:3]; incoming = p[2].split(': ')[-1]; m = re.match(r'(\d+)/(\d+)', p[4])
-            outgoing_hp = hp.get(active.get(slot), 1)
+            slot = p[2][:3]; incoming = f"{slot[:2]}:{p[2].split(': ')[-1]}"; m = re.match(r'(\d+)/(\d+)', p[4])
+            outgoing_hp = decision_hp.get(active.get(slot), hp.get(active.get(slot), 1))
             hp[incoming] = int(m[1]) / int(m[2]) if m else 1
-            if slot[:2] == opp and turn > 0 and slot not in fainted_slots and k == 'switch' and slot not in acted:
-                rows.append((turn, hp_bucket(outgoing_hp), 'switch', band))
+            if slot[:2] == opp and turn > 0 and slot not in fainted_slots and slot not in forced_slots and k == 'switch' and slot not in acted:
+                rows.append((turn, hp_bucket(outgoing_hp), 'switch', band, active.get(slot) in setup_users))
                 acted.add(slot)
             active[slot] = incoming
         elif k in ('-damage', '-heal') and len(p) > 3:
-            m = re.match(r'(\d+)/(\d+)', p[3]); name = p[2].split(': ')[-1]
+            m = re.match(r'(\d+)/(\d+)', p[3]); name = f"{p[2][:2]}:{p[2].split(': ')[-1]}"
             if m: hp[name] = int(m[1]) / int(m[2])
+        elif k == '-enditem' and p[3] in ('Eject Button', 'Eject Pack'): forced_slots.add(p[2][:3])
+        elif k == '-ability' and p[3] in ('Emergency Exit', 'Wimp Out'): forced_slots.add(p[2][:3])
         elif k == 'faint': fainted_slots.add(p[2][:3])
         elif k == 'move' and len(p) > 3 and p[2][:2] == opp and 'move:' not in ''.join(p[4:5]):
-            slot = p[2][:3]; name = p[2].split(': ')[-1]
+            slot = p[2][:3]; name = f"{slot[:2]}:{p[2].split(': ')[-1]}"
             if slot in acted: continue
             acted.add(slot)
-            f = hp.get(name, 1)
-            kind = 'protect' if p[3] in PROTECT else 'fakeout' if p[3] == 'Fake Out' else 'move'
-            rows.append((turn, hp_bucket(f), kind, band))
+            f = decision_hp.get(name, hp.get(name, 1))
+            kind = 'protect' if p[3] in PROTECT else 'fakeout' if p[3] == 'Fake Out' else 'setup' if p[3] in setup_names else 'move'
+            rows.append((turn, hp_bucket(f), kind, band, name in setup_users))
             if kind == 'move' and len(p) > 4 and p[4][:2] != opp and p[4][:2] in ('p1', 'p2'): turn_targets[slot] = p[4][:3]
 # switches recorded before the turn counter increments were forced replacements; keep only rows from turn >= 1 with a live slot
 table = collections.defaultdict(collections.Counter)
 band_table = collections.defaultdict(lambda: collections.defaultdict(collections.Counter))
-for turn, hb, kind, band in rows:
+setup_eligible = collections.Counter()
+band_setup_eligible = collections.defaultdict(collections.Counter)
+for turn, hb, kind, band, eligible in rows:
     table[f'{turn_bucket(turn)}:{hb}'][kind] += 1
     band_table[band][f'{turn_bucket(turn)}:{hb}'][kind] += 1
+    if eligible:
+        setup_eligible[f'{turn_bucket(turn)}:{hb}'] += 1
+        band_setup_eligible[band][f'{turn_bucket(turn)}:{hb}'] += 1
 out = {'games': len(seen), 'rows': len(rows), 'table': {}}
 for key, c in sorted(table.items()):
     n = sum(c.values()); out['table'][key] = {'n': n, **{k: round(c[k] / n, 3) for k in ('move', 'protect', 'fakeout', 'switch')}}
+if setup_names:
+    pooled_setup = sum(c['setup'] for c in table.values()) / max(1, sum(setup_eligible.values()))
+    out['setupMoveNames'] = sorted(setup_names)
+    out['setupEligibleRows'] = sum(setup_eligible.values())
+    out['setupRows'] = sum(c['setup'] for c in table.values())
+    for key, c in table.items():
+        out['table'][key]['setup'] = round((c['setup'] + 30 * pooled_setup) / (setup_eligible[key] + 30), 3)
 def rates(c, fallback=None, prior=30):
     n = sum(c.values()); out = {'n': n}
     for k in ('move', 'protect', 'fakeout', 'switch'):
@@ -78,6 +104,9 @@ for band, cells in band_table.items():
     n_games = sum(sum(c.values()) for c in cells.values())
     out['bands'][band] = {'rows': n_games, 'focusFire': round(focus[band][0] / max(1, focus[band][1]), 3), 'focusTurns': focus[band][1],
                           'table': {key: rates(c, out['table'].get(key)) for key, c in sorted(cells.items())}}
+    if setup_names:
+        for key, c in cells.items():
+            out['bands'][band]['table'][key]['setup'] = round((c['setup'] + 30 * out['table'][key]['setup']) / (band_setup_eligible[band][key] + 30), 3)
 target = sys.argv[sys.argv.index('--out') + 1] if '--out' in sys.argv else 'runs/champions-vgc-2026-reg-mc/human-behaviour.json'
 json.dump(out, open(target, 'w'), indent=1)
 print(json.dumps(out, indent=1))

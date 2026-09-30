@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // Builds legal, validated Reg M-C teams that mirror the opposing teams seen in OUR OWN ladder games. Each team keeps its observed six
-// species and every move/item/ability actually revealed; the gaps are filled from per-species frequencies pooled over all our games
+// species and revealed sets; gaps use per-species frequencies fitted only on the earlier training split
 // (falling back to random legal choices). Stat points come from the project's role-based optimiser. Output: teams/human-*.json.
-//   node scripts/build-human-teams.mjs [--heldout 60] [--out runs/champions-vgc-2026-reg-mc/teams]
+//   node scripts/build-human-teams.mjs [--raw observations.json] [--heldout 60] [--variants 1] [--out teams-dir]
 import {readFileSync, writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import showdown from 'pokemon-showdown';
@@ -13,7 +13,11 @@ const FORMAT = 'gen9championsvgc2026regmc';
 const args = process.argv.slice(2);
 const opt = (name, fallback) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : fallback; };
 const heldout = Number(opt('--heldout', 60)), outDir = opt('--out', 'runs/champions-vgc-2026-reg-mc/teams');
-const raw = JSON.parse(readFileSync('runs/champions-vgc-2026-reg-mc/human-teams/raw.json', 'utf8'));
+const variants = Number(opt('--variants', 1));
+if (!Number.isInteger(heldout) || heldout < 1 || !Number.isInteger(variants) || variants < 1) throw new Error('heldout and variants must be positive integers');
+const raw = JSON.parse(readFileSync(opt('--raw', 'runs/champions-vgc-2026-reg-mc/human-teams/raw.json'), 'utf8'));
+if (raw.length <= heldout) throw new Error('Need more observed battles than heldout size');
+const trainingRaw = raw.slice(0, -heldout), heldoutRaw = raw.slice(-heldout);
 const dex = Dex.forFormat(FORMAT), validator = new TeamValidator(FORMAT);
 const rng = new PRNG('7,11,13,17');
 const pick = list => list[Math.floor(rng.random() * list.length)];
@@ -26,9 +30,9 @@ const weighted = (entries, exclude = new Set()) => {
   return pool.at(-1)[0];
 };
 
-// Pooled per-species statistics from every observed game.
+// Fit imputation statistics only on earlier training battles.
 const stats = {};
-for (const team of raw) for (const [species, info] of Object.entries(team.revealed)) {
+for (const team of trainingRaw) for (const [species, info] of Object.entries(team.revealed)) {
   const s = (stats[species] ??= {moves: {}, items: {}, abilities: {}});
   for (const move of info.moves) s.moves[move] = (s.moves[move] ?? 0) + 1;
   if (info.item) s.items[info.item] = (s.items[info.item] ?? 0) + 1;
@@ -62,20 +66,23 @@ function makeSet(species, info, usedItems, attempt) {
 
 const built = [];
 const failures = {};
-for (const team of raw) {
+for (const team of raw) for (let variant = 0; variant < (trainingRaw.includes(team) ? variants : 1); variant++) {
   let pack;
   for (let attempt = 0; attempt < 12 && !pack; attempt++) {
     const used = new Set();
     const sets = team.species.map(species => makeSet(species, team.revealed[species], used, attempt));
     try { pack = packValidatedTeam(sets); } catch (error) { failures[String(error.message).slice(0, 60)] = (failures[String(error.message).slice(0, 60)] ?? 0) + 1; }
   }
-  if (pack) built.push({species: team.species, pack, room: team.room});
+  if (pack) built.push({species: team.species, pack, room: team.room, split: trainingRaw.includes(team) ? 'train' : 'heldout'});
 }
-// Unique by pack; hold out the last `heldout` for evaluation only.
-const unique = [...new Map(built.map(t => [t.pack, t])).values()];
-const train = unique.slice(0, Math.max(0, unique.length - heldout)), held = unique.slice(-heldout);
-const write = (team, name, split) => writeFileSync(`${outDir}/${name}.json`, JSON.stringify({split, species: team.species, pack: team.pack, source: 'built from own ladder observations',
+const held = [...new Map(built.filter(t => t.split === 'heldout').map(t => [t.pack, t])).values()];
+const heldPacks = new Set(held.map(t => t.pack));
+const train = [...new Map(built.filter(t => t.split === 'train' && !heldPacks.has(t.pack)).map(t => [t.pack, t])).values()];
+if (!train.length || !held.length) throw new Error('No valid teams in one split');
+const write = (team, name, split) => writeFileSync(`${outDir}/${name}.json`, JSON.stringify({split, room: team.room, species: team.species, pack: team.pack, source: 'built from own ladder observations; training-only imputation statistics',
   teamSHA256: createHash('sha256').update(team.pack).digest('hex')}, null, 1));
 train.forEach((t, i) => write(t, `human-${i + 1}`, 'train'));
 held.forEach((t, i) => write(t, `human-heldout-${i + 1}`, 'heldout'));
-console.log(JSON.stringify({observedTeams: raw.length, validTeams: built.length, unique: unique.length, train: train.length, heldout: held.length, failures}));
+writeFileSync(`${outDir}/train-rooms.json`, JSON.stringify(trainingRaw.map(t => t.room)));
+writeFileSync(`${outDir}/heldout-rooms.json`, JSON.stringify(heldoutRaw.map(t => t.room)));
+console.log(JSON.stringify({observedTeams: raw.length, validTeams: built.length, variants, train: train.length, heldout: held.length, failures}));
